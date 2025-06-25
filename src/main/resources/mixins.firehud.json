@@ -1,0 +1,21 @@
+{
+  "compatibilityLevel": "${java_version}",
+  "minVersion": "0.8",
+  "package": "dev.tellinq.firehud.client.mixin",
+  "refmap": "mixins.${mod_id}.refmap.json",
+  "injectors": {
+    "maxShiftBy": 5
+  },
+  "client": [
+    "BackgroundRendererMixin",
+    "ClientEntityMixin",
+    "ClientPlayNetworkHandlerMixin",
+    "EntityRenderDispatcherMixin",
+    "EntityRendererMixin",
+    "EntityRenderStateMixin",
+    "FireBlockMixin",
+    "InGameHudMixin",
+    "InGameOverlayRendererMixin"
+  ],
+  "verbose": true
+}

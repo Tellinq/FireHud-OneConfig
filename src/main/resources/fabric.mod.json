@@ -1,0 +1,46 @@
+{
+    "schemaVersion": 1,
+    "id": "${mod_id}",
+    "version": "${mod_version}-${mc_version}",
+    "name": "${mod_name}",
+    "description": "${mod_description}",
+    "authors": [
+        "LordEnder_Kitty"
+    ],
+    "contributors": [
+        "DApples_",
+        "Tellinq"
+    ],
+    "environment": "client",
+    "entrypoints": {
+        "main": [
+            {
+                "value": "dev.tellinq.firehud.FireHudEntrypoint"
+            }
+        ],
+        "client": [
+            {
+                "value": "dev.tellinq.firehud.FireHudEntrypoint"
+            }
+        ]
+    },
+    "mixins": [
+        "mixins.${mod_id}.json"
+    ],
+    "accessWidener" : "firehud.accesswidener",
+    "depends": {
+        "minecraft": "~${minor_mc_version}",
+        "fabricloader": ">=0.15.11",
+        "fabric-api": "*"
+    },
+    "custom": {
+        "modmenu": {
+            "update_checker": true,
+            "links": {
+                "CurseForge": "https://www.curseforge.com/minecraft/mc-mods/firehud",
+                "Modrinth": "https://modrinth.com/mod/firehud",
+                "GitHub": "https://github.com/LordEnder-Kitty/FireHud"
+            }
+        }
+    }
+}
