@@ -1,4 +1,4 @@
-package dev.tellinq.firehud.client.mixin;
+package dev.tellinq.firehud.client.mixin.feature.lavafog;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.client.render.BackgroundRenderer;
@@ -21,13 +21,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 //#endif
 
 @Mixin(BackgroundRenderer.class)
-public class BackgroundRendererMixin {
+public class Mixin_BackgroundRenderer_LavaFog {
 
     @Unique
     private static float capturedViewDistance;
 
     @Inject(method = "applyFog", at = @At("HEAD"))
-    private static void captureViewDistance(Camera camera,
+    private static void fireHud$captureViewDistance(Camera camera,
                                             BackgroundRenderer.FogType fogType,
                                             //#if MC >= 1.21.2
                                             Vector4f color,
@@ -43,7 +43,7 @@ public class BackgroundRendererMixin {
     }
 
     @Redirect(method = "applyFog", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;isSpectator()Z"))
-    private static boolean applyFog(Entity entity) {
+    private static boolean fireHud$replaceSpectatorConditionWithCustom(Entity entity) {
         return FireHudConfig.Lava.renderLavaFog == 1;
     }
 
@@ -51,7 +51,7 @@ public class BackgroundRendererMixin {
             method = "applyFog",
             at = @At(value = "CONSTANT", args = "floatValue=0.5", ordinal = 0)
     )
-    private static float viewDistFogEndFix(float original) {
+    private static float fireHud$viewDistFogEndFix(float original) {
         if (FireHudConfig.Lava.renderLavaFog == 1) {
             return FireHudConfig.Lava.distance / capturedViewDistance;
         }
@@ -59,7 +59,7 @@ public class BackgroundRendererMixin {
     }
 
     @ModifyExpressionValue(method = "applyFog", at = @At(value = "CONSTANT", args = "floatValue=-8.0", ordinal = 0))
-    private static float viewDistFogStartFix(float original) {
+    private static float fireHud$viewDistFogStartFix(float original) {
         if (FireHudConfig.Lava.renderLavaFog == 1) {
             return 0.0f;
         }
@@ -67,7 +67,7 @@ public class BackgroundRendererMixin {
     }
 
     @Inject(method = "applyFog", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;isSpectator()Z", ordinal = 0), cancellable = true)
-    private static void applyFog(Camera camera,
+    private static void fireHud$disableFog(Camera camera,
                                  BackgroundRenderer.FogType fogType,
                                  //#if MC >= 1.21.2
                                  Vector4f color,

@@ -1,14 +1,13 @@
-package dev.tellinq.firehud.client.mixin;
+package dev.tellinq.firehud.client.mixin.feature.soulfire;
 
 import org.spongepowered.asm.mixin.Mixin;
 
 //#if MC >= 1.21.2
 import net.minecraft.client.render.entity.state.EntityRenderState;
-import dev.tellinq.firehud.client.SoulFireRenderStateAccessor;
 import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(EntityRenderState.class)
-public class EntityRenderStateMixin implements SoulFireRenderStateAccessor {
+public class Mixin_EntityRenderState_SoulFire implements Accessor_EntityRenderState_SoulFire {
     @Unique private boolean onSoulFire;
     
     @Override

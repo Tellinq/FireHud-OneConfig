@@ -1,4 +1,4 @@
-package dev.tellinq.firehud.client.mixin;
+package dev.tellinq.firehud.client.mixin.feature.soulfire;
 
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import org.spongepowered.asm.mixin.Mixin;
@@ -18,7 +18,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import dev.tellinq.firehud.client.config.FireHudConfig;
-import dev.tellinq.firehud.client.SoulFireEntityAccessor;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -26,30 +25,30 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 //#endif
 
 @Mixin(ClientPlayNetworkHandler.class)
-public class ClientPlayNetworkHandlerMixin {
+public class Mixin_ClientPlayNetworkHandler_SoulFire {
     //#if MC > 1.19.2
     @Shadow private ClientWorld world;
     
     @Inject(method = "onEntityDamage", at = @At("HEAD"))
-    public void entitySetsOnSoulFire(EntityDamageS2CPacket packet, CallbackInfo ci) {
+    public void fireHud$entitySetsOnSoulFire(EntityDamageS2CPacket packet, CallbackInfo ci) {
         if (FireHudConfig.renderSoulFire && this.world != null) {
             Entity targetEntity = this.world.getEntityById(packet.comp_1267());
             Entity sourceEntity = this.world.getEntityById(packet.comp_1270());
             if (targetEntity != null && sourceEntity != null) {
                 if ((sourceEntity instanceof ZombieEntity || sourceEntity instanceof ArrowEntity) && sourceEntity.doesRenderOnFire()) {
-                    ((SoulFireEntityAccessor) targetEntity).fireHud$setOnSoulFire(((SoulFireEntityAccessor) sourceEntity).fireHud$isOnSoulFire());
+                    ((Accessor_SoulFireEntity) targetEntity).fireHud$setOnSoulFire(((Accessor_SoulFireEntity) sourceEntity).fireHud$isOnSoulFire());
                 }
             }
             if (targetEntity != null) {
                 if (packet.createDamageSource(this.world).isOf(DamageTypes.LIGHTNING_BOLT)) {
-                    ((SoulFireEntityAccessor) targetEntity).fireHud$setOnSoulFire(false);
+                    ((Accessor_SoulFireEntity) targetEntity).fireHud$setOnSoulFire(false);
                 }
             }
         }
     }
     
     @Inject(method = "tick", at = @At("HEAD"))
-    public void clientTickEvents(CallbackInfo ci) {
+    public void fireHud$clientTickEvents(CallbackInfo ci) {
         if (this.world != null && FireHudConfig.renderSoulFire) {
             this.world.getEntities().forEach(entity -> {
                 Box box = entity.getBoundingBox();
@@ -63,9 +62,9 @@ public class ClientPlayNetworkHandlerMixin {
                                 mutable.set(i, j, k);
                                 try {
                                     Block block = entity.getWorld().getBlockState(mutable).getBlock();
-                                    if (block instanceof SoulFireBlock) ((SoulFireEntityAccessor)entity).fireHud$setOnSoulFire(true);
-                                    if (block instanceof FireBlock) ((SoulFireEntityAccessor)entity).fireHud$setOnSoulFire(false);
-                                    if (entity.isInLava()) ((SoulFireEntityAccessor)entity).fireHud$setOnSoulFire(false);
+                                    if (block instanceof SoulFireBlock) ((Accessor_SoulFireEntity)entity).fireHud$setOnSoulFire(true);
+                                    if (block instanceof FireBlock) ((Accessor_SoulFireEntity)entity).fireHud$setOnSoulFire(false);
+                                    if (entity.isInLava()) ((Accessor_SoulFireEntity)entity).fireHud$setOnSoulFire(false);
                                 } catch (Throwable throwable) {
                                     CrashReport crashReport = CrashReport.create(throwable, "Colliding entity with block");
                                     throw new CrashException(crashReport);

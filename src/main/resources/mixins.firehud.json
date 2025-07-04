@@ -7,15 +7,15 @@
     "maxShiftBy": 5
   },
   "client": [
-    "BackgroundRendererMixin",
-    "ClientEntityMixin",
-    "ClientPlayNetworkHandlerMixin",
-    "EntityRenderDispatcherMixin",
-    "EntityRendererMixin",
-    "EntityRenderStateMixin",
-    "FireBlockMixin",
-    "InGameHudMixin",
-    "InGameOverlayRendererMixin"
+    "feature.firehearts.Mixin_InGameHud_FireHearts",
+    "feature.fireoverlay.Mixin_EntityRenderDispatcher_ThirdPersonFire",
+    "feature.fireoverlay.Mixin_InGameOverlayRenderer_FirstPersonFireOverlay",
+    "feature.firesound.Mixin_AbstractFireBlock_FireSound",
+    "feature.lavafog.Mixin_BackgroundRenderer_LavaFog",
+    "feature.soulfire.Mixin_ClientEntity_SoulFire",
+    "feature.soulfire.Mixin_ClientPlayNetworkHandler_SoulFire",
+    "feature.soulfire.Mixin_EntityRenderer_SoulFire",
+    "feature.soulfire.Mixin_EntityRenderState_SoulFire"
   ],
   "verbose": true
 }

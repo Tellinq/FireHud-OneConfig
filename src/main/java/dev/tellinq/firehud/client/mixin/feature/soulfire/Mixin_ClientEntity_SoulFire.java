@@ -1,12 +1,11 @@
-package dev.tellinq.firehud.client.mixin;
+package dev.tellinq.firehud.client.mixin.feature.soulfire;
 
 import net.minecraft.entity.Entity;
-import dev.tellinq.firehud.client.SoulFireEntityAccessor;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(Entity.class)
-public class ClientEntityMixin implements SoulFireEntityAccessor {
+public class Mixin_ClientEntity_SoulFire implements Accessor_SoulFireEntity {
     @Unique private boolean soulFire;
     
     @Override

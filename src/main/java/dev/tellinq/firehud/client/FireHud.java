@@ -2,6 +2,7 @@ package dev.tellinq.firehud.client;
 
 //import net.fabricmc.fabric.api.client.rendering.v1.HudLayerRegistrationCallback;
 //import net.fabricmc.fabric.api.client.rendering.v1.IdentifiedLayer;
+import dev.tellinq.firehud.client.mixin.feature.soulfire.Accessor_SoulFireEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.entity.effect.StatusEffects;
@@ -31,10 +32,10 @@ public class FireHud {
         if (player != null && player.isOnFire() && client.options.getPerspective().isFirstPerson() &&
                 !(!FireHudConfig.FirstPersonFire.whenInLava && player.isInLava()) && !(!FireHudConfig.FirstPersonFire.fireResistance && player.hasStatusEffect(StatusEffects.FIRE_RESISTANCE))) {
 
-            if (FireHudConfig.FireScreenTint.enabled && !((SoulFireEntityAccessor) player).fireHud$isOnSoulFire()) {
+            if (FireHudConfig.FireScreenTint.enabled && !((Accessor_SoulFireEntity) player).fireHud$isOnSoulFire()) {
                 context.fillGradient(0, 0, width, height, FireHudConfig.FireScreenTint.tintStartColor.getArgb(), FireHudConfig.FireScreenTint.tintEndColor.getArgb());
             }
-            if (FireHudConfig.FireScreenTint.enabled && FireHudConfig.renderSoulFire && ((SoulFireEntityAccessor) player).fireHud$isOnSoulFire()) {
+            if (FireHudConfig.FireScreenTint.enabled && FireHudConfig.renderSoulFire && ((Accessor_SoulFireEntity) player).fireHud$isOnSoulFire()) {
                 context.fillGradient(0, 0, width, height, FireHudConfig.FireScreenTint.soulTintStartColor.getArgb(), FireHudConfig.FireScreenTint.soulTintEndColor.getArgb());
             }
         }

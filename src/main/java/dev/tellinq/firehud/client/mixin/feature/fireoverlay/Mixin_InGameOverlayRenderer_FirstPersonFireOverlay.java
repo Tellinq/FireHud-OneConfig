@@ -1,4 +1,4 @@
-package dev.tellinq.firehud.client.mixin;
+package dev.tellinq.firehud.client.mixin.feature.fireoverlay;
 
 
 //#if MC <= 1.21.3
@@ -42,7 +42,7 @@ import net.minecraft.util.math.RotationAxis;
 //#endif
 import dev.tellinq.firehud.client.FireHud;
 import dev.tellinq.firehud.client.config.FireHudConfig;
-import dev.tellinq.firehud.client.SoulFireEntityAccessor;
+import dev.tellinq.firehud.client.mixin.feature.soulfire.Accessor_SoulFireEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -52,18 +52,18 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(InGameOverlayRenderer.class)
-public class InGameOverlayRendererMixin {
+public class Mixin_InGameOverlayRenderer_FirstPersonFireOverlay {
     @Unique private static final SpriteIdentifier SOUL_FIRE_1 = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, FireHud.getIdentifierOf("block/soul_fire_1"));
 
     @Inject(method = "renderOverlays", at = @At("TAIL"))
-    private static void renderOverlays(MinecraftClient client, MatrixStack matrices,
+    private static void fireHud$renderOverlays(MinecraftClient client, MatrixStack matrices,
                                        //#if MC >= 1.21.4
                                        VertexConsumerProvider vertexConsumers,
                                        //#endif
                                        CallbackInfo ci) {
         if (client.player != null && !client.player.isSpectator() && client.player.isOnFire() && FireHudConfig.FirstPersonFire.sideFire &&
                 !(!FireHudConfig.FirstPersonFire.whenInLava && client.player.isInLava()) && !(!FireHudConfig.FirstPersonFire.fireResistance && client.player.hasStatusEffect(StatusEffects.FIRE_RESISTANCE))) {
-            renderSideFireOverlay(client, matrices
+            fireHud$renderSideFireOverlay(client, matrices
                     //#if MC >= 1.21.4
                     , vertexConsumers
                     //#endif
@@ -72,7 +72,7 @@ public class InGameOverlayRendererMixin {
     }
     
     @Inject(method = "renderFireOverlay", at = @At("HEAD"), cancellable = true)
-    private static void renderVanillaHud(
+    private static void fireHud$renderVanillaHud(
             //#if MC <= 1.21.3
             //$$ MinecraftClient client,
             //#endif
@@ -92,7 +92,7 @@ public class InGameOverlayRendererMixin {
     }
     
     @ModifyArg(method = "renderFireOverlay", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/VertexConsumer;color(FFFF)Lnet/minecraft/client/render/VertexConsumer;"), index = 3)
-    private static float fireOpacity(float red) {
+    private static float fireHud$fireOpacity(float red) {
         return FireHudConfig.FirstPersonFire.opacity / 100F;
     }
 
@@ -111,26 +111,26 @@ public class InGameOverlayRendererMixin {
     )
 
     //#if MC > 1.19.2
-    private static float firePos(float y) {
+    private static float fireHud$firePos(float y) {
     //#else
-    //$$ private static double firePos(double y) {
+    //$$ private static double fireHud$firePos(double y) {
     //#endif
         return -1.0f + (FireHudConfig.FirstPersonFire.height / 100F);
     }
     
     @Redirect(method = "renderFireOverlay", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/SpriteIdentifier;getSprite()Lnet/minecraft/client/texture/Sprite;"))
-    private static Sprite getSprite(SpriteIdentifier instance) {
+    private static Sprite fireHud$getSprite(SpriteIdentifier instance) {
         MinecraftClient client = MinecraftClient.getInstance();
-        if (FireHudConfig.renderSoulFire && client.player != null && ((SoulFireEntityAccessor) client.player).fireHud$isOnSoulFire()) return SOUL_FIRE_1.getSprite();
+        if (FireHudConfig.renderSoulFire && client.player != null && ((Accessor_SoulFireEntity) client.player).fireHud$isOnSoulFire()) return SOUL_FIRE_1.getSprite();
         return instance.getSprite();
     }
 
 
     @Unique
-    private static void renderSideFireOverlay(MinecraftClient client, MatrixStack matrices
-                                              //#if MC >= 1.21.4
+    private static void fireHud$renderSideFireOverlay(MinecraftClient client, MatrixStack matrices
+                                                      //#if MC >= 1.21.4
                                               , VertexConsumerProvider vertexConsumers
-                                              //#endif
+                                                      //#endif
     ) {
         //#if MC > 1.19.2
         //#if MC < 1.21
@@ -150,7 +150,7 @@ public class InGameOverlayRendererMixin {
         //$$  RenderSystem.depthMask(false);
         //$$  RenderSystem.enableBlend();
         //#endif
-        Sprite sprite = (FireHudConfig.renderSoulFire && client.player != null && ((SoulFireEntityAccessor) client.player).fireHud$isOnSoulFire() ? SOUL_FIRE_1.getSprite() : ModelBaker.FIRE_1.getSprite());
+        Sprite sprite = (FireHudConfig.renderSoulFire && client.player != null && ((Accessor_SoulFireEntity) client.player).fireHud$isOnSoulFire() ? SOUL_FIRE_1.getSprite() : ModelBaker.FIRE_1.getSprite());
         //#if MC <= 1.21.3
         //$$  RenderSystem.setShaderTexture(0, sprite.getAtlasId());
         //#endif

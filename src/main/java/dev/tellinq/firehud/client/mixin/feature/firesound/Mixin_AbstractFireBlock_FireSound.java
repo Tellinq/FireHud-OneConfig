@@ -1,4 +1,4 @@
-package dev.tellinq.firehud.client.mixin;
+package dev.tellinq.firehud.client.mixin.feature.firesound;
 
 import net.minecraft.block.AbstractFireBlock;
 import net.minecraft.sound.SoundCategory;
@@ -15,10 +15,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(AbstractFireBlock.class)
-public class FireBlockMixin {
+public class Mixin_AbstractFireBlock_FireSound {
     
     @Redirect(method = "randomDisplayTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;playSound(DDDLnet/minecraft/sound/SoundEvent;Lnet/minecraft/sound/SoundCategory;FFZ)V"))
-    private void fireSound(World world, double x, double y, double z, SoundEvent sound, SoundCategory category, float volume, float pitch, boolean useDistance) {
+    private void fireHud$fireSound(World world, double x, double y, double z, SoundEvent sound, SoundCategory category, float volume, float pitch, boolean useDistance) {
         //#if MC > 1.18.2
         float randomFl = Random.create().nextFloat();
         //#else
