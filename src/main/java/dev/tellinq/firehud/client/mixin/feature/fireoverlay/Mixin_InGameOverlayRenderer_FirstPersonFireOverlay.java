@@ -42,7 +42,7 @@ import net.minecraft.util.math.RotationAxis;
 //#endif
 import dev.tellinq.firehud.client.FireHud;
 import dev.tellinq.firehud.client.config.FireHudConfig;
-import dev.tellinq.firehud.client.mixin.feature.soulfire.Accessor_SoulFireEntity;
+import dev.tellinq.firehud.client.accessor.Accessor_SoulFireEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -63,7 +63,7 @@ public class Mixin_InGameOverlayRenderer_FirstPersonFireOverlay {
                                        CallbackInfo ci) {
         if (client.player != null && !client.player.isSpectator() && client.player.isOnFire() && FireHudConfig.FirstPersonFire.sideFire &&
                 !(!FireHudConfig.FirstPersonFire.whenInLava && client.player.isInLava()) && !(!FireHudConfig.FirstPersonFire.fireResistance && client.player.hasStatusEffect(StatusEffects.FIRE_RESISTANCE))) {
-            fireHud$renderSideFireOverlay(client, matrices
+            fireHud$renderSideFireOverlay(matrices
                     //#if MC >= 1.21.4
                     , vertexConsumers
                     //#endif
@@ -127,7 +127,7 @@ public class Mixin_InGameOverlayRenderer_FirstPersonFireOverlay {
 
 
     @Unique
-    private static void fireHud$renderSideFireOverlay(MinecraftClient client, MatrixStack matrices
+    private static void fireHud$renderSideFireOverlay(MatrixStack matrices
                                                       //#if MC >= 1.21.4
                                               , VertexConsumerProvider vertexConsumers
                                                       //#endif
@@ -150,7 +150,7 @@ public class Mixin_InGameOverlayRenderer_FirstPersonFireOverlay {
         //$$  RenderSystem.depthMask(false);
         //$$  RenderSystem.enableBlend();
         //#endif
-        Sprite sprite = (FireHudConfig.renderSoulFire && client.player != null && ((Accessor_SoulFireEntity) client.player).fireHud$isOnSoulFire() ? SOUL_FIRE_1.getSprite() : ModelBaker.FIRE_1.getSprite());
+        Sprite sprite = fireHud$getSprite(ModelBaker.FIRE_1);
         //#if MC <= 1.21.3
         //$$  RenderSystem.setShaderTexture(0, sprite.getAtlasId());
         //#endif
@@ -174,12 +174,11 @@ public class Mixin_InGameOverlayRenderer_FirstPersonFireOverlay {
         float interpolatedV1 = MathHelper.lerp(animationFrameDelta, minV, midV);
         float interpolatedV2 = MathHelper.lerp(animationFrameDelta, maxV, midV);
 
-        float fireOpacity = FireHudConfig.FirstPersonFire.opacity / 100F;
-        float firePos = FireHudConfig.FirstPersonFire.height / 100F;
+        float fireOpacity = fireHud$fireOpacity(0.9f);
 
         for (int r = 0; r < 2; ++r) {
             matrices.push();
-            matrices.translate((float)(-(r * 2 - 1)) * 0.24f, -1.0f + firePos, -0.2f); // y:-0.3f
+            matrices.translate((float)(-(r * 2 - 1)) * 0.24f, fireHud$firePos(-0.3f), -0.2f); // y:-0.3f
 
             //#if MC > 1.19.2
             matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(0.0f));

@@ -2,7 +2,7 @@ package dev.tellinq.firehud.client;
 
 //import net.fabricmc.fabric.api.client.rendering.v1.HudLayerRegistrationCallback;
 //import net.fabricmc.fabric.api.client.rendering.v1.IdentifiedLayer;
-import dev.tellinq.firehud.client.mixin.feature.soulfire.Accessor_SoulFireEntity;
+import dev.tellinq.firehud.client.accessor.Accessor_SoulFireEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.entity.effect.StatusEffects;

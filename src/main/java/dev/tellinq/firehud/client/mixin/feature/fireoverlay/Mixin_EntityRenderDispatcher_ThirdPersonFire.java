@@ -1,10 +1,7 @@
 package dev.tellinq.firehud.client.mixin.feature.fireoverlay;
 
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
-import dev.tellinq.firehud.client.mixin.feature.soulfire.Accessor_SoulFireEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
@@ -23,7 +20,7 @@ import org.joml.Quaternionf;
 //#endif
 import dev.tellinq.firehud.client.FireHud;
 import dev.tellinq.firehud.client.config.FireHudConfig;
-import dev.tellinq.firehud.client.mixin.feature.soulfire.Accessor_EntityRenderState_SoulFire;
+import dev.tellinq.firehud.client.accessor.Accessor_EntityRenderState_SoulFire;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;

@@ -19,11 +19,12 @@ public class Mixin_AbstractFireBlock_FireSound {
     
     @Redirect(method = "randomDisplayTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;playSound(DDDLnet/minecraft/sound/SoundEvent;Lnet/minecraft/sound/SoundCategory;FFZ)V"))
     private void fireHud$fireSound(World world, double x, double y, double z, SoundEvent sound, SoundCategory category, float volume, float pitch, boolean useDistance) {
-        //#if MC > 1.18.2
-        float randomFl = Random.create().nextFloat();
-        //#else
-        //$$ float randomFl = new Random().nextFloat();
-        //#endif
+        float randomFl =
+                //#if MC > 1.18.2
+                Random.create().nextFloat();
+                //#else
+                //$$ new Random().nextFloat();
+                //#endif
         
         world.playSound(x, y, z, sound, category, (FireHudConfig.FireVolumePitch.fireVolume / 100f) + (FireHudConfig.FireVolumePitch.randomizeFireVolume ? randomFl : 0), (FireHudConfig.FireVolumePitch.randomizeFirePitch ? randomFl * 0.7f : 0) + (FireHudConfig.FireVolumePitch.firePitch / 100f), useDistance);
     }

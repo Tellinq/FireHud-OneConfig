@@ -15,7 +15,8 @@
     "feature.soulfire.Mixin_ClientEntity_SoulFire",
     "feature.soulfire.Mixin_ClientPlayNetworkHandler_SoulFire",
     "feature.soulfire.Mixin_EntityRenderer_SoulFire",
-    "feature.soulfire.Mixin_EntityRenderState_SoulFire"
+    "feature.soulfire.Mixin_EntityRenderState_SoulFire",
+    "feature.vignette.Mixin_InGameHud_Vignette"
   ],
   "verbose": true
 }

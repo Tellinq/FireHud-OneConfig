@@ -1,5 +1,6 @@
 package dev.tellinq.firehud.client.mixin.feature.soulfire;
 
+import dev.tellinq.firehud.client.accessor.Accessor_SoulFireEntity;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import org.spongepowered.asm.mixin.Mixin;
 //#if MC > 1.19.2
