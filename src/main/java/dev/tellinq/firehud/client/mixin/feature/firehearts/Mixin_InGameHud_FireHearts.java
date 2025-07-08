@@ -8,6 +8,7 @@ import dev.tellinq.firehud.client.EnchantTags;
 import dev.tellinq.firehud.client.FireHud;
 import dev.tellinq.firehud.client.accessor.Accessor_SoulFireEntity;
 import net.fabricmc.fabric.api.tag.client.v1.ClientTags;
+import net.minecraft.registry.entry.RegistryEntry;
 //#endif
 import net.minecraft.block.Blocks;
 import net.minecraft.block.CampfireBlock;
@@ -20,7 +21,6 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.Identifier;
 import dev.tellinq.firehud.client.config.FireHudConfig;
