@@ -2,6 +2,7 @@ package dev.tellinq.firehud.client;
 
 //import net.fabricmc.fabric.api.client.rendering.v1.HudLayerRegistrationCallback;
 //import net.fabricmc.fabric.api.client.rendering.v1.IdentifiedLayer;
+import dev.tellinq.firehud.FireHudConstants;
 import dev.tellinq.firehud.client.accessor.Accessor_SoulFireEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -13,7 +14,6 @@ import dev.tellinq.firehud.client.config.FireHudConfig;
 import org.polyfrost.oneconfig.api.commands.v1.CommandManager;
 
 public class FireHud {
-    public static final String MOD_ID = "firehud";
     public static final FireHud INSTANCE = new FireHud();
 
     public void initialize() {
@@ -60,5 +60,9 @@ public class FireHud {
                         //$$  new Identifier
                         //#endif
                                 (a, b);
+    }
+
+    public static Identifier getFireHudResource(String path) {
+        return getIdentifierOf(FireHudConstants.ID, path);
     }
 }

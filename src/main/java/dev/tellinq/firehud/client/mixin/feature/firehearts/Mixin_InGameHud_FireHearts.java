@@ -3,9 +3,9 @@ package dev.tellinq.firehud.client.mixin.feature.firehearts;
 //#if MC <= 1.21.1
 //$$ import com.mojang.blaze3d.systems.RenderSystem;
 //#endif
+import dev.tellinq.firehud.client.FireHud;
 //#if FABRIC && MC >= 1.20.5
 import dev.tellinq.firehud.client.EnchantTags;
-import dev.tellinq.firehud.client.FireHud;
 import dev.tellinq.firehud.client.accessor.Accessor_SoulFireEntity;
 import net.fabricmc.fabric.api.tag.client.v1.ClientTags;
 import net.minecraft.registry.entry.RegistryEntry;
@@ -31,23 +31,23 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(InGameHud.class)
 public abstract class Mixin_InGameHud_FireHearts {
-    @Unique private static final Identifier FIRE_HEART_FULL_TEXTURE = FireHud.getIdentifierOf(FireHud.MOD_ID, "hud/heart/fire_full");
-    @Unique private static final Identifier FIRE_HEART_FULL_BLINKING_TEXTURE = FireHud.getIdentifierOf(FireHud.MOD_ID, "hud/heart/fire_full_blinking");
-    @Unique private static final Identifier FIRE_HEART_HALF_TEXTURE = FireHud.getIdentifierOf(FireHud.MOD_ID, "hud/heart/fire_half");
-    @Unique private static final Identifier FIRE_HEART_HALF_BLINKING_TEXTURE = FireHud.getIdentifierOf(FireHud.MOD_ID, "hud/heart/fire_half_blinking");
-    @Unique private static final Identifier FIRE_HEART_HARDCORE_FULL_TEXTURE = FireHud.getIdentifierOf(FireHud.MOD_ID, "hud/heart/fire_hardcore_full");
-    @Unique private static final Identifier FIRE_HEART_HARDCORE_FULL_BLINKING_TEXTURE = FireHud.getIdentifierOf(FireHud.MOD_ID, "hud/heart/fire_hardcore_full_blinking");
-    @Unique private static final Identifier FIRE_HEART_HARDCORE_HALF_TEXTURE = FireHud.getIdentifierOf(FireHud.MOD_ID, "hud/heart/fire_hardcore_half");
-    @Unique private static final Identifier FIRE_HEART_HARDCORE_HALF_BLINKING_TEXTURE = FireHud.getIdentifierOf(FireHud.MOD_ID, "hud/heart/fire_hardcore_half_blinking");
+    @Unique private static final Identifier FIRE_HEART_FULL_TEXTURE = FireHud.getFireHudResource("hud/heart/fire_full");
+    @Unique private static final Identifier FIRE_HEART_FULL_BLINKING_TEXTURE = FireHud.getFireHudResource("hud/heart/fire_full_blinking");
+    @Unique private static final Identifier FIRE_HEART_HALF_TEXTURE = FireHud.getFireHudResource("hud/heart/fire_half");
+    @Unique private static final Identifier FIRE_HEART_HALF_BLINKING_TEXTURE = FireHud.getFireHudResource("hud/heart/fire_half_blinking");
+    @Unique private static final Identifier FIRE_HEART_HARDCORE_FULL_TEXTURE = FireHud.getFireHudResource("hud/heart/fire_hardcore_full");
+    @Unique private static final Identifier FIRE_HEART_HARDCORE_FULL_BLINKING_TEXTURE = FireHud.getFireHudResource("hud/heart/fire_hardcore_full_blinking");
+    @Unique private static final Identifier FIRE_HEART_HARDCORE_HALF_TEXTURE = FireHud.getFireHudResource("hud/heart/fire_hardcore_half");
+    @Unique private static final Identifier FIRE_HEART_HARDCORE_HALF_BLINKING_TEXTURE = FireHud.getFireHudResource("hud/heart/fire_hardcore_half_blinking");
     
-    @Unique private static final Identifier SOUL_FIRE_HEART_FULL_TEXTURE = FireHud.getIdentifierOf(FireHud.MOD_ID, "hud/heart/soul_fire_full");
-    @Unique private static final Identifier SOUL_FIRE_HEART_FULL_BLINKING_TEXTURE = FireHud.getIdentifierOf(FireHud.MOD_ID, "hud/heart/soul_fire_full_blinking");
-    @Unique private static final Identifier SOUL_FIRE_HEART_HALF_TEXTURE = FireHud.getIdentifierOf(FireHud.MOD_ID, "hud/heart/soul_fire_half");
-    @Unique private static final Identifier SOUL_FIRE_HEART_HALF_BLINKING_TEXTURE = FireHud.getIdentifierOf(FireHud.MOD_ID, "hud/heart/soul_fire_half_blinking");
-    @Unique private static final Identifier SOUL_FIRE_HEART_HARDCORE_FULL_TEXTURE = FireHud.getIdentifierOf(FireHud.MOD_ID, "hud/heart/soul_fire_hardcore_full");
-    @Unique private static final Identifier SOUL_FIRE_HEART_HARDCORE_FULL_BLINKING_TEXTURE = FireHud.getIdentifierOf(FireHud.MOD_ID, "hud/heart/soul_fire_hardcore_full_blinking");
-    @Unique private static final Identifier SOUL_FIRE_HEART_HARDCORE_HALF_TEXTURE = FireHud.getIdentifierOf(FireHud.MOD_ID, "hud/heart/soul_fire_hardcore_half");
-    @Unique private static final Identifier SOUL_FIRE_HEART_HARDCORE_HALF_BLINKING_TEXTURE = FireHud.getIdentifierOf(FireHud.MOD_ID, "hud/heart/soul_fire_hardcore_half_blinking");
+    @Unique private static final Identifier SOUL_FIRE_HEART_FULL_TEXTURE = FireHud.getFireHudResource("hud/heart/soul_fire_full");
+    @Unique private static final Identifier SOUL_FIRE_HEART_FULL_BLINKING_TEXTURE = FireHud.getFireHudResource("hud/heart/soul_fire_full_blinking");
+    @Unique private static final Identifier SOUL_FIRE_HEART_HALF_TEXTURE = FireHud.getFireHudResource("hud/heart/soul_fire_half");
+    @Unique private static final Identifier SOUL_FIRE_HEART_HALF_BLINKING_TEXTURE = FireHud.getFireHudResource("hud/heart/soul_fire_half_blinking");
+    @Unique private static final Identifier SOUL_FIRE_HEART_HARDCORE_FULL_TEXTURE = FireHud.getFireHudResource("hud/heart/soul_fire_hardcore_full");
+    @Unique private static final Identifier SOUL_FIRE_HEART_HARDCORE_FULL_BLINKING_TEXTURE = FireHud.getFireHudResource("hud/heart/soul_fire_hardcore_full_blinking");
+    @Unique private static final Identifier SOUL_FIRE_HEART_HARDCORE_HALF_TEXTURE = FireHud.getFireHudResource("hud/heart/soul_fire_hardcore_half");
+    @Unique private static final Identifier SOUL_FIRE_HEART_HARDCORE_HALF_BLINKING_TEXTURE = FireHud.getFireHudResource("hud/heart/soul_fire_hardcore_half_blinking");
 
     /**
      * Redirects the heart texture rendering in the in-game HUD to use custom Fire and Soul Fire heart textures

@@ -11,7 +11,7 @@ public interface EnchantTags {
     TagKey<Enchantment> FROST_WALKER = EnchantTags.of("prevents_fire_hearts");
             
     private static TagKey<Enchantment> of(String id) {
-        return TagKey.of(RegistryKeys.ENCHANTMENT, FireHud.getIdentifierOf(FireHud.MOD_ID, id));
+        return TagKey.of(RegistryKeys.ENCHANTMENT, FireHud.getFireHudResource(id));
     }
     //#endif
 }

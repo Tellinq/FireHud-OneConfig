@@ -4,9 +4,9 @@ package dev.tellinq.firehud.client.mixin.feature.vignette;
 //$$ import com.mojang.blaze3d.systems.RenderSystem;
 //#endif
 //#if FABRIC && MC >= 1.20.5
-import dev.tellinq.firehud.client.FireHud;
 import dev.tellinq.firehud.client.accessor.Accessor_SoulFireEntity;
 //#endif
+import dev.tellinq.firehud.client.FireHud;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
@@ -56,8 +56,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  */
 @Mixin(InGameHud.class)
 public abstract class Mixin_InGameHud_Vignette {
-    @Unique private static final Identifier FIRE_VIGNETTE = FireHud.getIdentifierOf(FireHud.MOD_ID, "textures/fire/fire_vignette.png");
-    @Unique private static final Identifier SOUL_FIRE_VIGNETTE = FireHud.getIdentifierOf(FireHud.MOD_ID, "textures/fire/soul_fire_vignette.png");
+    @Unique private static final Identifier FIRE_VIGNETTE = FireHud.getFireHudResource("textures/fire/fire_vignette.png");
+    @Unique private static final Identifier SOUL_FIRE_VIGNETTE = FireHud.getFireHudResource("textures/fire/soul_fire_vignette.png");
 
     /**
      * Helper method to determine if the HUD vignette should be scaled to a specific value, based on configuration
