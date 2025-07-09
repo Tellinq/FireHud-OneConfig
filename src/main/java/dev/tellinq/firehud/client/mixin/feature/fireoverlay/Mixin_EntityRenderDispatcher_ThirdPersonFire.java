@@ -27,7 +27,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 //#if MC <= 1.21.1
 //$$ import org.spongepowered.asm.mixin.injection.Redirect;
-//$$ import dev.tellinq.firehud.client.Accessor_SoulFireEntity;
+//$$ import dev.tellinq.firehud.client.accessor.Accessor_SoulFireEntity;
 //#endif
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 

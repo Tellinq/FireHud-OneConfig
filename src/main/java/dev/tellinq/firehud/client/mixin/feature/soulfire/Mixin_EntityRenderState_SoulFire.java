@@ -24,6 +24,6 @@ public class Mixin_EntityRenderState_SoulFire implements Accessor_EntityRenderSt
 //#else
 //$$ import net.minecraft.client.render.entity.EntityRenderer;
 //$$ @Mixin(EntityRenderer.class)
-//$$ public class EntityRenderStateMixin {
+//$$ public class Mixin_EntityRenderState_SoulFire {
 //$$ }
 //#endif
