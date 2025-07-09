@@ -2,6 +2,7 @@ package dev.tellinq.firehud.client.mixin.feature.fireoverlay;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
+import dev.deftu.omnicore.common.OmniIdentifier;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
@@ -18,7 +19,6 @@ import net.minecraft.entity.effect.StatusEffects;
 //#if MC > 1.19.2
 import org.joml.Quaternionf;
 //#endif
-import dev.tellinq.firehud.client.FireHud;
 import dev.tellinq.firehud.client.config.FireHudConfig;
 import dev.tellinq.firehud.client.accessor.Accessor_EntityRenderState_SoulFire;
 import org.spongepowered.asm.mixin.Mixin;
@@ -37,8 +37,8 @@ public
 abstract
 //#endif
 class Mixin_EntityRenderDispatcher_ThirdPersonFire {
-    @Unique private static final SpriteIdentifier SOUL_FIRE_0 = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, FireHud.getIdentifierOf("block/soul_fire_0"));
-    @Unique private static final SpriteIdentifier SOUL_FIRE_1 = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, FireHud.getIdentifierOf("block/soul_fire_1"));
+    @Unique private static final SpriteIdentifier SOUL_FIRE_0 = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, OmniIdentifier.create("block/soul_fire_0"));
+    @Unique private static final SpriteIdentifier SOUL_FIRE_1 = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, OmniIdentifier.create("block/soul_fire_1"));
     
     @Inject(method = "renderFire", at = @At(value = "HEAD"), cancellable = true)
     private void fireHud$renderThirdPersonFire(MatrixStack matrices, VertexConsumerProvider vertexConsumers,

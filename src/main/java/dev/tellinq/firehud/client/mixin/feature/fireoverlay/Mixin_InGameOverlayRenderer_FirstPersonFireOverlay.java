@@ -5,6 +5,7 @@ package dev.tellinq.firehud.client.mixin.feature.fireoverlay;
 //$$ import com.mojang.blaze3d.systems.RenderSystem;
 //#endif
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
+import dev.deftu.omnicore.common.OmniIdentifier;
 import dev.tellinq.firehud.client.accessor.Accessor_SoulFireEntity;
 import net.minecraft.client.MinecraftClient;
 //#if MC >= 1.21.2 && MC <= 1.21.3
@@ -54,7 +55,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(InGameOverlayRenderer.class)
 public class Mixin_InGameOverlayRenderer_FirstPersonFireOverlay {
-    @Unique private static final SpriteIdentifier SOUL_FIRE_1 = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, FireHud.getIdentifierOf("block/soul_fire_1"));
+    @Unique private static final SpriteIdentifier SOUL_FIRE_1 = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, OmniIdentifier.create("block/soul_fire_1"));
 
     @Inject(method = "renderOverlays", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameOverlayRenderer;renderFireOverlay(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;)V", shift = At.Shift.AFTER))
     private static void fireHud$renderSideFireHUD(MinecraftClient client, MatrixStack matrices,

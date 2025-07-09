@@ -2,6 +2,7 @@ package dev.tellinq.firehud.client;
 
 //import net.fabricmc.fabric.api.client.rendering.v1.HudLayerRegistrationCallback;
 //import net.fabricmc.fabric.api.client.rendering.v1.IdentifiedLayer;
+import dev.deftu.omnicore.common.OmniIdentifier;
 import dev.tellinq.firehud.FireHudConstants;
 import dev.tellinq.firehud.client.accessor.Accessor_SoulFireEntity;
 import net.minecraft.client.MinecraftClient;
@@ -42,27 +43,7 @@ public class FireHud {
     }
     //#endif
 
-    public static Identifier getIdentifierOf(String a) {
-        return
-                //#if MC >= 1.21
-                Identifier.of
-                        //#else
-                        //$$  new Identifier
-                        //#endif
-                                (a);
-    }
-
-    public static Identifier getIdentifierOf(String a, String b) {
-        return
-                //#if MC >= 1.21
-                Identifier.of
-                        //#else
-                        //$$  new Identifier
-                        //#endif
-                                (a, b);
-    }
-
     public static Identifier getFireHudResource(String path) {
-        return getIdentifierOf(FireHudConstants.ID, path);
+        return OmniIdentifier.create(FireHudConstants.ID, path);
     }
 }
