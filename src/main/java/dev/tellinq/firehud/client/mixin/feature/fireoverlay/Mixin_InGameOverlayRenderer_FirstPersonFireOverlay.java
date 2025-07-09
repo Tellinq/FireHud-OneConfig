@@ -4,6 +4,8 @@ package dev.tellinq.firehud.client.mixin.feature.fireoverlay;
 //#if MC <= 1.21.3
 //$$ import com.mojang.blaze3d.systems.RenderSystem;
 //#endif
+import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
+import dev.tellinq.firehud.client.accessor.Accessor_SoulFireEntity;
 import net.minecraft.client.MinecraftClient;
 //#if MC >= 1.21.2 && MC <= 1.21.3
 //$$ import net.minecraft.client.gl.ShaderProgramKeys;
@@ -42,7 +44,6 @@ import net.minecraft.util.math.RotationAxis;
 //#endif
 import dev.tellinq.firehud.client.FireHud;
 import dev.tellinq.firehud.client.config.FireHudConfig;
-import dev.tellinq.firehud.client.accessor.Accessor_SoulFireEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -55,14 +56,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class Mixin_InGameOverlayRenderer_FirstPersonFireOverlay {
     @Unique private static final SpriteIdentifier SOUL_FIRE_1 = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, FireHud.getIdentifierOf("block/soul_fire_1"));
 
-    @Inject(method = "renderOverlays", at = @At("TAIL"))
-    private static void fireHud$renderOverlays(MinecraftClient client, MatrixStack matrices,
-                                       //#if MC >= 1.21.4
-                                       VertexConsumerProvider vertexConsumers,
-                                       //#endif
-                                       CallbackInfo ci) {
-        if (client.player != null && !client.player.isSpectator() && client.player.isOnFire() && FireHudConfig.FirstPersonFire.sideFire &&
-                !(!FireHudConfig.FirstPersonFire.whenInLava && client.player.isInLava()) && !(!FireHudConfig.FirstPersonFire.fireResistance && client.player.hasStatusEffect(StatusEffects.FIRE_RESISTANCE))) {
+    @Inject(method = "renderOverlays", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameOverlayRenderer;renderFireOverlay(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;)V", shift = At.Shift.AFTER))
+    private static void fireHud$renderSideFireHUD(MinecraftClient client, MatrixStack matrices,
+                                          //#if MC >= 1.21.4
+                                          VertexConsumerProvider vertexConsumers,
+                                          //#endif
+                                          CallbackInfo ci) {
+        if (FireHudConfig.FirstPersonFire.sideFire && fireHud$shouldRenderFire(client)){
             fireHud$renderSideFireOverlay(matrices
                     //#if MC >= 1.21.4
                     , vertexConsumers
@@ -70,30 +70,49 @@ public class Mixin_InGameOverlayRenderer_FirstPersonFireOverlay {
             );
         }
     }
-    
-    @Inject(method = "renderFireOverlay", at = @At("HEAD"), cancellable = true)
-    private static void fireHud$renderVanillaHud(
+
+    @WrapWithCondition(method = "renderOverlays", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameOverlayRenderer;renderFireOverlay(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;)V"))
+    private static boolean fireHud$shouldRenderFirstPersonFire(
             //#if MC <= 1.21.3
             //$$ MinecraftClient client,
             //#endif
-            MatrixStack matrices,
+            MatrixStack matrices
             //#if MC >= 1.21.4
-            VertexConsumerProvider vertexConsumers,
+            , VertexConsumerProvider vertexConsumers
             //#endif
-            CallbackInfo ci) {
-        if (!FireHudConfig.FirstPersonFire.enabled) ci.cancel();
+    ) {
+        if (!FireHudConfig.FirstPersonFire.enabled) {
+            return false;
+        }
         //#if MC >= 1.21.4
         MinecraftClient client = MinecraftClient.getInstance();
         //#endif
-        if (client.player != null && client.player.isOnFire()) {
-            if ((!FireHudConfig.FirstPersonFire.whenInLava && client.player.isInLava())) ci.cancel();
-            if ((!FireHudConfig.FirstPersonFire.fireResistance && client.player.hasStatusEffect(StatusEffects.FIRE_RESISTANCE))) ci.cancel();
-        }
+        return fireHud$shouldRenderFire(client);
     }
-    
+
+    @Unique
+    private static boolean fireHud$shouldRenderFire(MinecraftClient client) {
+        if (client.player != null) {
+            if ((!FireHudConfig.FirstPersonFire.whenInLava && client.player.isInLava())) {
+                return false;
+            }
+            if ((!FireHudConfig.FirstPersonFire.fireResistance && client.player.hasStatusEffect(StatusEffects.FIRE_RESISTANCE))) {
+                int duration = client.player.getStatusEffect(StatusEffects.FIRE_RESISTANCE).getDuration();
+                return duration < 100;
+            }
+        }
+        return true;
+    }
+
     @ModifyArg(method = "renderFireOverlay", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/VertexConsumer;color(FFFF)Lnet/minecraft/client/render/VertexConsumer;"), index = 3)
-    private static float fireHud$fireOpacity(float red) {
-        return FireHudConfig.FirstPersonFire.opacity / 100F;
+    private static float fireHud$fireOpacity(float opacity) {
+        float fireOpacity = FireHudConfig.FirstPersonFire.opacity / 100F;
+        MinecraftClient client = MinecraftClient.getInstance();
+        if (client.player.hasStatusEffect(StatusEffects.FIRE_RESISTANCE)) {
+            int duration = client.player.getStatusEffect(StatusEffects.FIRE_RESISTANCE).getDuration();
+            fireOpacity *= duration > 100 ? 1.0F : 0.5F - MathHelper.sin(((float)duration - 0) * (float)Math.PI * 0.2F) * 0.5F;
+        }
+        return fireOpacity;
     }
 
 
@@ -117,7 +136,7 @@ public class Mixin_InGameOverlayRenderer_FirstPersonFireOverlay {
     //#endif
         return -1.0f + (FireHudConfig.FirstPersonFire.height / 100F);
     }
-    
+
     @Redirect(method = "renderFireOverlay", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/SpriteIdentifier;getSprite()Lnet/minecraft/client/texture/Sprite;"))
     private static Sprite fireHud$getSprite(SpriteIdentifier instance) {
         MinecraftClient client = MinecraftClient.getInstance();
@@ -129,7 +148,7 @@ public class Mixin_InGameOverlayRenderer_FirstPersonFireOverlay {
     @Unique
     private static void fireHud$renderSideFireOverlay(MatrixStack matrices
                                                       //#if MC >= 1.21.4
-                                              , VertexConsumerProvider vertexConsumers
+                                                      , VertexConsumerProvider vertexConsumers
                                                       //#endif
     ) {
         //#if MC > 1.19.2
