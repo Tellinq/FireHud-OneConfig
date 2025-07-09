@@ -3,6 +3,7 @@ package dev.tellinq.firehud.client.config;
 import dev.tellinq.firehud.FireHudConstants;
 import org.polyfrost.oneconfig.api.config.v1.Config;
 import org.polyfrost.oneconfig.api.config.v1.annotations.*;
+import org.polyfrost.polyui.color.ColorUtils;
 import org.polyfrost.polyui.color.PolyColor;
 
 /**
@@ -133,13 +134,13 @@ public class FireHudConfig extends Config {
         public static PolyColor tintStartColor = PolyColor.TRANSPARENT;
 
         @Color(title = "Tint End Color")
-        public static PolyColor tintEndColor = PolyColor.TRANSPARENT; // Needs to be changed to #66FF0000
+        public static PolyColor tintEndColor = ColorUtils.rgba(255, 0, 0, 0.4f);
 
         @Color(title = "Soul Tint Start Color")
         public static PolyColor soulTintStartColor = PolyColor.TRANSPARENT;
 
         @Color(title = "Soul Tint End Color")
-        public static PolyColor soulTintEndColor = PolyColor.TRANSPARENT; // Needs to be changed to #660000FF
+        public static PolyColor soulTintEndColor = ColorUtils.rgba(0, 0, 255, 0.4f);
     }
 
     @Switch(title = "Render Soul Fire", subcategory = "Soul Fire")
