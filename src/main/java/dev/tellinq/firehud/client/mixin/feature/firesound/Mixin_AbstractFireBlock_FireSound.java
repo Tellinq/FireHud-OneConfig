@@ -3,16 +3,17 @@ package dev.tellinq.firehud.client.mixin.feature.firesound;
 import net.minecraft.block.AbstractFireBlock;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
-//#if MC > 1.18.2
-import net.minecraft.util.math.random.Random;
-//#else
-//$$ import java.util.Random;
-//#endif
 import net.minecraft.world.World;
 import dev.tellinq.firehud.client.config.FireHudConfig;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
+
+//#if MC > 1.18.2
+import net.minecraft.util.math.random.Random;
+//#else
+//$$ import java.util.Random;
+//#endif
 
 @Mixin(AbstractFireBlock.class)
 public class Mixin_AbstractFireBlock_FireSound {

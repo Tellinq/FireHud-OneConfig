@@ -1,33 +1,41 @@
 package dev.tellinq.firehud.client.mixin.feature.vignette;
 
-//#if MC <= 1.21.1
-//$$ import com.mojang.blaze3d.systems.RenderSystem;
-//#endif
-//#if FABRIC && MC >= 1.20.5
-import dev.tellinq.firehud.client.accessor.Accessor_SoulFireEntity;
-//#endif
+import dev.deftu.omnicore.client.OmniClient;
+import dev.deftu.omnicore.client.OmniGameOptions;
+import dev.deftu.omnicore.client.render.OmniResolution;
 import dev.tellinq.firehud.client.FireHud;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.render.RenderLayer;
-//#if MC >= 1.21
-import net.minecraft.client.render.RenderTickCounter;
-//#endif
 import net.minecraft.client.util.Window;
-//#if MC <= 1.20.4
-//$$ import net.minecraft.enchantment.EnchantmentHelper;
-//#endif
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.ColorHelper;
+import dev.tellinq.firehud.client.accessor.Accessor_SoulFireEntity;
 import dev.tellinq.firehud.client.config.FireHudConfig;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+//#if MC <= 1.21.1
+//$$ import com.mojang.blaze3d.systems.RenderSystem;
+//#endif
+
+//#if MC >= 1.21
+import net.minecraft.client.render.RenderTickCounter;
+//#endif
+
+//#if MC <= 1.20.4
+//$$ import net.minecraft.enchantment.EnchantmentHelper;
+//#endif
+
+//#if MC <= 1.19.4
+//$$ import net.minecraft.client.util.math.MatrixStack;
+//#endif
 
 /**
  * Mixin for {@link InGameHud} to add custom rendering for Fire Hearts and Soul Fire Hearts,
@@ -68,7 +76,7 @@ public abstract class Mixin_InGameHud_Vignette {
     @Unique
     private boolean fireHud$scaleHelper(int scale) {
         int hudScale = FireHudConfig.FireVignette.scale;
-        int guiScale = MinecraftClient.getInstance().options.getGuiScale().getValue();
+        int guiScale = OmniClient.getInstance().options.getGuiScale().getValue();
         return hudScale == scale || hudScale == 0 && guiScale == scale;
     }
 
@@ -96,18 +104,13 @@ public abstract class Mixin_InGameHud_Vignette {
                         //$$ float tickDelta,
                         //#endif
                         CallbackInfo ci) {
-        MinecraftClient client = MinecraftClient.getInstance();
+        MinecraftClient client = OmniClient.getInstance();
         PlayerEntity player = client.player;
 
         Identifier texture = player != null && ((Accessor_SoulFireEntity) player).fireHud$isOnSoulFire() ? SOUL_FIRE_VIGNETTE : FIRE_VIGNETTE;
-        //#if MC <= 1.19.4
-        Window window = client.getWindow();
-        //$$ int width = window.getScaledWidth();
-        //$$ int height = window.getScaledHeight();
-        //#else
-        int width = context.getScaledWindowWidth();
-        int height = context.getScaledWindowHeight();
-        //#endif
+
+        int width = OmniResolution.getScaledWidth();
+        int height = OmniResolution.getScaledHeight();
         int var1 = fireHud$scaleHelper(4) ? 1 : fireHud$scaleHelper(3) ? 2 : fireHud$scaleHelper(2) ? 3 : fireHud$scaleHelper(1) ? 4 : 1;
         int var2 = fireHud$scaleHelper(4) ? 2 : fireHud$scaleHelper(3) ? 4 : fireHud$scaleHelper(2) ? 6 : fireHud$scaleHelper(1) ? 8 : 2;
         int var3 = fireHud$scaleHelper(4) ? 1 : fireHud$scaleHelper(3) ? 3 : fireHud$scaleHelper(2) ? 5 : fireHud$scaleHelper(1) ? 7 : 3;

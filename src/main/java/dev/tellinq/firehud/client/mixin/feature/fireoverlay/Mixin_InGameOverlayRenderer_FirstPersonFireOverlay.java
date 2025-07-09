@@ -1,34 +1,11 @@
 package dev.tellinq.firehud.client.mixin.feature.fireoverlay;
 
 
-//#if MC <= 1.21.3
-//$$ import com.mojang.blaze3d.systems.RenderSystem;
-//#endif
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import dev.deftu.omnicore.common.OmniIdentifier;
 import dev.tellinq.firehud.client.accessor.Accessor_SoulFireEntity;
 import net.minecraft.client.MinecraftClient;
-//#if MC >= 1.21.2 && MC <= 1.21.3
-//$$ import net.minecraft.client.gl.ShaderProgramKeys;
-//#endif
 import net.minecraft.client.gui.hud.InGameOverlayRenderer;
-//#if MC >= 1.21.4
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.RenderLayer;
-//#endif
-//#if MC <= 1.21.3
-//$$ import net.minecraft.client.render.BufferBuilder;
-//$$ import net.minecraft.client.render.VertexFormat;
-//$$ import net.minecraft.client.render.VertexFormats;
-//$$ import net.minecraft.client.render.Tessellator;
-//$$ import net.minecraft.client.render.BufferRenderer;
-//#endif
-//#if MC <= 1.21.1
-//$$ import net.minecraft.client.render.GameRenderer;
-//#else
-//$$
-//#endif
 import net.minecraft.client.render.model.ModelBaker;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.texture.SpriteAtlasTexture;
@@ -36,14 +13,6 @@ import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.util.math.MathHelper;
-//#if MC > 1.19.2
-import org.joml.Matrix4f;
-import net.minecraft.util.math.RotationAxis;
-//#else
-//$$ import net.minecraft.util.math.Matrix4f;
-//$$ import net.minecraft.util.math.Vec3f;
-//#endif
-import dev.tellinq.firehud.client.FireHud;
 import dev.tellinq.firehud.client.config.FireHudConfig;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -52,6 +21,37 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+//#if MC >= 1.21.4
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.RenderLayer;
+//#endif
+
+//#if MC <= 1.21.3
+//$$ import com.mojang.blaze3d.systems.RenderSystem;
+//$$ import net.minecraft.client.render.BufferBuilder;
+//$$ import net.minecraft.client.render.VertexFormat;
+//$$ import net.minecraft.client.render.VertexFormats;
+//$$ import net.minecraft.client.render.Tessellator;
+//$$ import net.minecraft.client.render.BufferRenderer;
+//#endif
+
+//#if MC >= 1.21.2 && MC <= 1.21.3
+//$$ import net.minecraft.client.gl.ShaderProgramKeys;
+//#endif
+
+//#if MC <= 1.21.1
+//$$ import net.minecraft.client.render.GameRenderer;
+//#endif
+
+//#if MC > 1.19.2
+import org.joml.Matrix4f;
+import net.minecraft.util.math.RotationAxis;
+//#else
+//$$ import net.minecraft.util.math.Matrix4f;
+//$$ import net.minecraft.util.math.Vec3f;
+//#endif
 
 @Mixin(InGameOverlayRenderer.class)
 public class Mixin_InGameOverlayRenderer_FirstPersonFireOverlay {

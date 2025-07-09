@@ -6,30 +6,33 @@ import dev.deftu.omnicore.common.OmniIdentifier;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
-//#if MC >= 1.21.2
-import net.minecraft.client.render.entity.state.EntityRenderState;
-//#else
-//$$ import net.minecraft.entity.Entity;
-//#endif
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.effect.StatusEffects;
-//#if MC > 1.19.2
-import org.joml.Quaternionf;
-//#endif
 import dev.tellinq.firehud.client.config.FireHudConfig;
 import dev.tellinq.firehud.client.accessor.Accessor_EntityRenderState_SoulFire;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+//#if MC >= 1.21.2
+import net.minecraft.client.render.entity.state.EntityRenderState;
+//#else
+//$$ import net.minecraft.entity.Entity;
+//#endif
+
 //#if MC <= 1.21.1
 //$$ import org.spongepowered.asm.mixin.injection.Redirect;
 //$$ import dev.tellinq.firehud.client.accessor.Accessor_SoulFireEntity;
 //#endif
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+//#if MC > 1.19.2
+import org.joml.Quaternionf;
+//#endif
 
 @Mixin(EntityRenderDispatcher.class)
 public

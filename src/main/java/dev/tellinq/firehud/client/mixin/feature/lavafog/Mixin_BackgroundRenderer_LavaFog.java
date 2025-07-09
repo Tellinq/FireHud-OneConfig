@@ -3,21 +3,20 @@ package dev.tellinq.firehud.client.mixin.feature.lavafog;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.client.render.BackgroundRenderer;
 import net.minecraft.client.render.Camera;
-//#if MC >= 1.21.2
-import net.minecraft.client.render.Fog;
-//#endif
 import net.minecraft.entity.Entity;
-//#if MC >= 1.21.2
-import org.joml.Vector4f;
-//#endif
 import dev.tellinq.firehud.client.config.FireHudConfig;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.*;
+
+//#if MC >= 1.21.2
+import net.minecraft.client.render.Fog;
+import org.joml.Vector4f;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+//#endif
+
 //#if MC <= 1.21.1
 //$$ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-//#elseif MC >= 1.21.2
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 //#endif
 
 @Mixin(BackgroundRenderer.class)

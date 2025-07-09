@@ -1,23 +1,12 @@
 package dev.tellinq.firehud.client.mixin.feature.firehearts;
 
-//#if MC <= 1.21.1
-//$$ import com.mojang.blaze3d.systems.RenderSystem;
-//#endif
+
 import dev.tellinq.firehud.client.FireHud;
-//#if FABRIC && MC >= 1.20.5
-import dev.tellinq.firehud.client.EnchantTags;
-import dev.tellinq.firehud.client.accessor.Accessor_SoulFireEntity;
-import net.fabricmc.fabric.api.tag.client.v1.ClientTags;
-import net.minecraft.registry.entry.RegistryEntry;
-//#endif
 import net.minecraft.block.Blocks;
 import net.minecraft.block.CampfireBlock;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.enchantment.Enchantment;
-//#if MC <= 1.20.4
-//$$ import net.minecraft.enchantment.EnchantmentHelper;
-//#endif
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
@@ -28,6 +17,21 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
+
+//#if MC <= 1.21.1
+//$$ import com.mojang.blaze3d.systems.RenderSystem;
+//#endif
+
+//#if FABRIC && MC >= 1.20.5
+import dev.tellinq.firehud.client.EnchantTags;
+import dev.tellinq.firehud.client.accessor.Accessor_SoulFireEntity;
+import net.fabricmc.fabric.api.tag.client.v1.ClientTags;
+import net.minecraft.registry.entry.RegistryEntry;
+//#endif
+
+//#if MC <= 1.20.4
+//$$ import net.minecraft.enchantment.EnchantmentHelper;
+//#endif
 
 @Mixin(InGameHud.class)
 public abstract class Mixin_InGameHud_FireHearts {
