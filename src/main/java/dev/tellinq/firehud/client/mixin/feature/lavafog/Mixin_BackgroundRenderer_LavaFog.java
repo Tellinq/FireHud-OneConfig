@@ -26,13 +26,23 @@ public class Mixin_BackgroundRenderer_LavaFog {
     @Unique
     private static float capturedViewDistance;
 
-    @Inject(method = "applyFog", at = @At("HEAD"))
-    private static void fireHud$captureViewDistance(Camera camera,
+    @Inject(method =
+            //#if MC > 1.17.1
+            "applyFog"
+            //#else
+            //$$ "setupFog(Lnet/minecraft/client/Camera;Lnet/minecraft/client/renderer/FogRenderer$FogMode;FZ)V"
+            //#endif
+            , at = @At("HEAD"))
+    private static void captureViewDistance(Camera camera,
                                             BackgroundRenderer.FogType fogType,
                                             //#if MC >= 1.21.2
                                             Vector4f color,
                                             //#endif
-                                            float viewDistance, boolean thickenFog, float tickDelta,
+                                            float viewDistance,
+                                            boolean thickenFog,
+                                            //#if MC >= 1.19
+                                            float tickDelta,
+                                            //#endif
                                             //#if MC >= 1.21.2
                                             CallbackInfoReturnable<Fog> cir
                                             //#elseif MC <= 1.21.1
@@ -42,37 +52,65 @@ public class Mixin_BackgroundRenderer_LavaFog {
         capturedViewDistance = viewDistance;
     }
 
-    @Redirect(method = "applyFog", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;isSpectator()Z"))
-    private static boolean fireHud$replaceSpectatorConditionWithCustom(Entity entity) {
+    @Redirect(method =
+            //#if MC > 1.17.1
+            "applyFog"
+            //#else
+            //$$ "setupFog(Lnet/minecraft/client/Camera;Lnet/minecraft/client/renderer/FogRenderer$FogMode;FZ)V"
+            //#endif
+            , at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;isSpectator()Z"))
+    private static boolean applyFog(Entity entity) {
         return FireHudConfig.Lava.renderLavaFog == 1;
     }
 
     @ModifyExpressionValue(
-            method = "applyFog",
+            method =
+                    //#if MC > 1.17.1
+                    "applyFog"
+            //#else
+            //$$ "setupFog(Lnet/minecraft/client/Camera;Lnet/minecraft/client/renderer/FogRenderer$FogMode;FZ)V"
+            //#endif
+            ,
             at = @At(value = "CONSTANT", args = "floatValue=0.5", ordinal = 0)
     )
-    private static float fireHud$viewDistFogEndFix(float original) {
+    private static float viewDistFogEndFix(float original) {
         if (FireHudConfig.Lava.renderLavaFog == 1) {
             return FireHudConfig.Lava.distance / capturedViewDistance;
         }
         return original;
     }
 
-    @ModifyExpressionValue(method = "applyFog", at = @At(value = "CONSTANT", args = "floatValue=-8.0", ordinal = 0))
-    private static float fireHud$viewDistFogStartFix(float original) {
+    @ModifyExpressionValue(method =
+            //#if MC > 1.17.1
+            "applyFog"
+            //#else
+            //$$ "setupFog(Lnet/minecraft/client/Camera;Lnet/minecraft/client/renderer/FogRenderer$FogMode;FZ)V"
+            //#endif
+            , at = @At(value = "CONSTANT", args = "floatValue=-8.0", ordinal = 0))
+    private static float viewDistFogStartFix(float original) {
         if (FireHudConfig.Lava.renderLavaFog == 1) {
             return 0.0f;
         }
         return original;
     }
 
-    @Inject(method = "applyFog", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;isSpectator()Z", ordinal = 0), cancellable = true)
-    private static void fireHud$disableFog(Camera camera,
+    @Inject(method =
+            //#if MC > 1.17.1
+            "applyFog"
+            //#else
+            //$$ "setupFog(Lnet/minecraft/client/Camera;Lnet/minecraft/client/renderer/FogRenderer$FogMode;FZ)V"
+            //#endif
+            , at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;isSpectator()Z", ordinal = 0), cancellable = true)
+    private static void applyFog(Camera camera,
                                  BackgroundRenderer.FogType fogType,
                                  //#if MC >= 1.21.2
                                  Vector4f color,
                                  //#endif
-                                 float viewDistance, boolean thickenFog, float tickDelta,
+                                 float viewDistance,
+                                 boolean thickenFog,
+                                 //#if MC >= 1.19
+                                 float tickDelta,
+                                 //#endif
                                  //#if MC >= 1.21.2
                                  CallbackInfoReturnable<Fog> cir
                                  //#elseif MC <= 1.21.1
