@@ -4,7 +4,8 @@
 
 Fork of LordEnder-Kitty's [FireHud](https://github.com/LordEnder-Kitty/FireHud). Designed to be a single branch with multiple Minecraft versions maintained.
 
-- All features from 1.20.2-1.21.4 are ported, except for text HUD overlay (only showed Fire Resistance as a text HUD which could be grabbed from Potion Effects).
-- 1.21.5 is also supported with all features
+- All features from 1.20.2-1.21.4 are ported, alongside 1.21.5. However, the Fire Resistance timer will not he ported as that will be part of a Potion Effects HUD mod instead.
 - 1.16.5-1.20.1 are supported with limited functionality
-- 1.8.9-1.12.2 are TBD
+- 1.8.9-1.12.2 are not supported. I have not decided if I will backport to these versions.
+
+If you have the knowledge to add support for anything not supported, PRs are welcome!
