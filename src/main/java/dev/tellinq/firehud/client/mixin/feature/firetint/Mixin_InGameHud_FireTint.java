@@ -65,7 +65,7 @@ public class Mixin_InGameHud_FireTint {
         if (FireHudConfig.FireScreenTint.enabled && isOnFire && isFirstPerson && showInLava && showWithFireRes) {
                 boolean isOnSoulFire = ((Accessor_SoulFireEntity) player).fireHud$isOnSoulFire() && FireHudConfig.renderSoulFire;
 
-                //#if MC <= 1.19.4
+                //#if MC > 1.19.4
                 context.fillGradient(0, 0, width, height,
                         isOnSoulFire ? FireHudConfig.FireScreenTint.soulTintStartColor.getArgb() : FireHudConfig.FireScreenTint.tintStartColor.getArgb(),
                         isOnSoulFire ? FireHudConfig.FireScreenTint.soulTintEndColor.getArgb() : FireHudConfig.FireScreenTint.tintEndColor.getArgb());
