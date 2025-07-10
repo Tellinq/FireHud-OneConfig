@@ -2,8 +2,9 @@ package dev.tellinq.firehud.client.mixin.feature.fireoverlay;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
+import dev.deftu.omnicore.client.OmniClientPlayer;
 import dev.deftu.omnicore.common.OmniIdentifier;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.texture.Sprite;
@@ -54,11 +55,11 @@ class Mixin_EntityRenderDispatcher_ThirdPersonFire {
                                        Quaternionf rotation,
                                        //#endif
                                        CallbackInfo ci) {
-        MinecraftClient client = MinecraftClient.getInstance();
+        ClientPlayerEntity player = OmniClientPlayer.getInstance();
 
-        if (client.player != null && client.player.isOnFire()) {
-            if ((!FireHudConfig.ThirdPersonFire.whenInLava && client.player.isInLava())) ci.cancel();
-            if ((!FireHudConfig.ThirdPersonFire.fireResistance && client.player.hasStatusEffect(StatusEffects.FIRE_RESISTANCE))) ci.cancel();
+        if (player != null && player.isOnFire()) {
+            if ((!FireHudConfig.ThirdPersonFire.whenInLava && player.isInLava())) ci.cancel();
+            if ((!FireHudConfig.ThirdPersonFire.fireResistance && player.hasStatusEffect(StatusEffects.FIRE_RESISTANCE))) ci.cancel();
             if (!FireHudConfig.ThirdPersonFire.enabled) ci.cancel();
         }
     }

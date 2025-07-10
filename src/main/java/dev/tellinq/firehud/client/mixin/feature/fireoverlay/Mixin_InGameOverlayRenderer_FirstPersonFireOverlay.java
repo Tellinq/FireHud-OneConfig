@@ -2,6 +2,8 @@ package dev.tellinq.firehud.client.mixin.feature.fireoverlay;
 
 
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
+import dev.deftu.omnicore.client.OmniClient;
+import dev.deftu.omnicore.client.OmniClientPlayer;
 import dev.deftu.omnicore.common.OmniIdentifier;
 import dev.tellinq.firehud.client.accessor.Accessor_SoulFireEntity;
 import net.minecraft.client.MinecraftClient;
@@ -21,6 +23,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.util.Objects;
 
 //#if MC >= 1.21.4
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -86,7 +90,7 @@ public class Mixin_InGameOverlayRenderer_FirstPersonFireOverlay {
             return false;
         }
         //#if MC >= 1.21.4
-        MinecraftClient client = MinecraftClient.getInstance();
+        MinecraftClient client = OmniClient.getInstance();
         //#endif
         return fireHud$shouldRenderFire(client);
     }
@@ -98,7 +102,7 @@ public class Mixin_InGameOverlayRenderer_FirstPersonFireOverlay {
                 return false;
             }
             if ((!FireHudConfig.FirstPersonFire.fireResistance && client.player.hasStatusEffect(StatusEffects.FIRE_RESISTANCE))) {
-                int duration = client.player.getStatusEffect(StatusEffects.FIRE_RESISTANCE).getDuration();
+                int duration = Objects.requireNonNull(client.player.getStatusEffect(StatusEffects.FIRE_RESISTANCE)).getDuration();
                 return duration < 100;
             }
         }
@@ -108,9 +112,8 @@ public class Mixin_InGameOverlayRenderer_FirstPersonFireOverlay {
     @ModifyArg(method = "renderFireOverlay", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/VertexConsumer;color(FFFF)Lnet/minecraft/client/render/VertexConsumer;"), index = 3)
     private static float fireHud$fireOpacity(float opacity) {
         float fireOpacity = FireHudConfig.FirstPersonFire.opacity / 100F;
-        MinecraftClient client = MinecraftClient.getInstance();
-        if (client.player.hasStatusEffect(StatusEffects.FIRE_RESISTANCE)) {
-            int duration = client.player.getStatusEffect(StatusEffects.FIRE_RESISTANCE).getDuration();
+        if (OmniClientPlayer.getInstance().hasStatusEffect(StatusEffects.FIRE_RESISTANCE)) {
+            int duration = OmniClientPlayer.getInstance().getStatusEffect(StatusEffects.FIRE_RESISTANCE).getDuration();
             fireOpacity *= duration > 100 ? 1.0F : 0.5F - MathHelper.sin(((float)duration - 0) * (float)Math.PI * 0.2F) * 0.5F;
         }
         return fireOpacity;
@@ -140,8 +143,10 @@ public class Mixin_InGameOverlayRenderer_FirstPersonFireOverlay {
 
     @Redirect(method = "renderFireOverlay", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/SpriteIdentifier;getSprite()Lnet/minecraft/client/texture/Sprite;"))
     private static Sprite fireHud$getSprite(SpriteIdentifier instance) {
-        MinecraftClient client = MinecraftClient.getInstance();
-        if (FireHudConfig.renderSoulFire && client.player != null && ((Accessor_SoulFireEntity) client.player).fireHud$isOnSoulFire()) return SOUL_FIRE_1.getSprite();
+        if (FireHudConfig.renderSoulFire && OmniClientPlayer.getInstance() != null && ((Accessor_SoulFireEntity) OmniClientPlayer.getInstance()).fireHud$isOnSoulFire()) {
+            return SOUL_FIRE_1.getSprite();
+        }
+
         return instance.getSprite();
     }
 

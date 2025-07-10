@@ -1,14 +1,12 @@
 package dev.tellinq.firehud.client.mixin.feature.vignette;
 
 import dev.deftu.omnicore.client.OmniClient;
-import dev.deftu.omnicore.client.OmniGameOptions;
 import dev.deftu.omnicore.client.render.OmniResolution;
 import dev.tellinq.firehud.client.FireHud;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.util.Window;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
