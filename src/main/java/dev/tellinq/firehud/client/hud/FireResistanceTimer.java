@@ -27,7 +27,8 @@ public class FireResistanceTimer extends TextHud {
 
     @Override
     protected @Nullable String getText() {
-        ClientWorld world = OmniClient.getInstance().world;
+        //#if MC > 1.19.4
+        ClientWorld world = OmniClient.getWorld();
         ClientPlayerEntity player = OmniClientPlayer.getInstance();
 
         if (player != null && world != null) {
@@ -41,6 +42,7 @@ public class FireResistanceTimer extends TextHud {
                 return text.getString();
             }
         }
+        //#endif
 
         return "00:00";
     }
