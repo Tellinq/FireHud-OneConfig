@@ -47,7 +47,11 @@ toolkitLoomHelper {
 }
 
 loom {
-    accessWidenerPath = rootProject.file("src/main/resources/${modData.id}.accesswidener")
+    val accessWidenerFilePath = "src/main/resources/${modData.id}.accesswidener";
+    val accessWidenerFile = project.file(accessWidenerFilePath).takeIf { it.exists() }
+        ?: rootProject.file(accessWidenerFilePath)
+
+    accessWidenerPath = accessWidenerFile
 }
 
 dependencies {
