@@ -25,9 +25,12 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 //#if FABRIC && MC >= 1.20.5
 import dev.tellinq.firehud.client.EnchantTags;
-import dev.tellinq.firehud.client.accessor.Accessor_SoulFireEntity;
 import net.fabricmc.fabric.api.tag.client.v1.ClientTags;
 import net.minecraft.registry.entry.RegistryEntry;
+//#endif
+
+//#if MC >= 1.20.2
+import dev.tellinq.firehud.client.accessor.Accessor_SoulFireEntity;
 //#endif
 
 //#if MC <= 1.20.4
