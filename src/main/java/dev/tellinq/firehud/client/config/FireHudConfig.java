@@ -119,7 +119,11 @@ public class FireHudConfig extends Config {
     //#endif
 
     //#if MC >= 1.20.2
-    @Switch(title = "Render Fire Hearts", subcategory = "Fire Hearts")
+    @Switch(
+            title = "Render Fire Hearts",
+            description = "Makes the player's hearts have a special texture when on fire, similar to poison or wither effects",
+            subcategory = "Fire Hearts"
+    )
     public static boolean renderFireHearts = false;
     //#endif
 
@@ -143,21 +147,27 @@ public class FireHudConfig extends Config {
         public static PolyColor soulTintEndColor = ColorUtils.rgba(0, 0, 255, 0.4f);
     }
 
-    @Switch(title = "Render Soul Fire", subcategory = "Soul Fire")
+    @Switch(
+            title = "Render Soul Fire",
+            description = "Change the fire color to match soul fire when standing on soul fire",
+            subcategory = "Soul Fire")
     public static boolean renderSoulFire = true;
 
     @Accordion(
-            title = "Lava Fog"
+            title = "Lava Fog",
+            description = "Lava Fog"
     )
     public static class Lava {
         @RadioButton(
                 title = "Render Lava Fog",
+                description = "Toggles rendering the fog effect when in lava, making it easier to see",
                 options = {"Vanilla",  "Light Fog", "No Fog"}
         )
         public static int renderLavaFog = 0;
 
         @Slider(
                 title = "Light Fog Distance",
+                description = "The view distance when in lava with Render Lava Fog set to Light Fog",
                 min = 0f, max = 100f,
                 step = 1
         )
