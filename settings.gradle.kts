@@ -11,7 +11,6 @@ pluginManagement {
         maven("https://maven.minecraftforge.net")
         maven("https://repo.essential.gg/repository/maven-public")
         maven("https://server.bbkr.space/artifactory/libs-release/")
-        maven("https://jitpack.io/")
 
         // Snapshots
         maven("https://maven.deftu.dev/snapshots")
@@ -24,7 +23,7 @@ pluginManagement {
 
     plugins {
         kotlin("jvm") version("2.0.20")
-        id("dev.deftu.gradle.multiversion-root") version("2.42.0")
+        id("dev.deftu.gradle.multiversion-root") version("2.+")
     }
 }
 
