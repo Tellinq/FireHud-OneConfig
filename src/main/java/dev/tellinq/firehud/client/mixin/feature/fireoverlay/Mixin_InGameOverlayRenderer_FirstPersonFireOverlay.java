@@ -56,11 +56,7 @@ public class Mixin_InGameOverlayRenderer_FirstPersonFireOverlay {
     //$$ private static void fireHud$renderSideFireHUD(MinecraftClient client, MatrixStack matrices, CallbackInfo ci) {
     //#endif
         if (FireHudConfig.FirstPersonFire.sideFire && fireHud$shouldRenderFire(client)){
-            fireHud$renderSideFireOverlay(matrices
-                    //#if MC >= 1.21.4
-                    , vertexConsumers
-                    //#endif
-            );
+            fireHud$renderSideFireOverlay(matrices);
         }
     }
 
@@ -137,11 +133,7 @@ public class Mixin_InGameOverlayRenderer_FirstPersonFireOverlay {
 
 
     @Unique
-    private static void fireHud$renderSideFireOverlay(MatrixStack matrices
-                                                      //#if MC >= 1.21.4
-                                                      , VertexConsumerProvider vertexConsumers
-                                                      //#endif
-    ) {
+    private static void fireHud$renderSideFireOverlay(MatrixStack matrices) {
         Sprite sprite = fireHud$getSprite(ModelBaker.FIRE_1);
 
         float minU = sprite.getMinU();
