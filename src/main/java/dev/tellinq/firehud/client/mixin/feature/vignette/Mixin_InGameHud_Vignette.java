@@ -4,6 +4,7 @@ import dev.deftu.omnicore.client.OmniClient;
 import dev.deftu.omnicore.client.render.OmniResolution;
 import dev.tellinq.firehud.client.FireHud;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.render.RenderLayer;
@@ -117,19 +118,20 @@ public abstract class Mixin_InGameHud_Vignette {
             if (!(!FireHudConfig.FirstPersonFire.whenInLava && player.isInLava())) {
                 if (!(!FireHudConfig.FirstPersonFire.fireResistance && player.hasStatusEffect(StatusEffects.FIRE_RESISTANCE))) {
                     if (player.isOnFire() && client.options.getPerspective().isFirstPerson()) {
-                        if (FireHudConfig.FireVignette.renderFireVignette == 1) {
-                            fireHud$renderTopLeftCorner(texture, context, width, height, var1, var2);
-                            fireHud$renderTopRightCorner(texture, context, width, height, var1, var2, var3);
-                            fireHud$renderBottomLeftCorner(texture, context, width, height, var1, var2, var3);
-                            fireHud$renderBottomRightCorner(texture, context, width, height, var1, var2, var3);
-                        }
-                        if (FireHudConfig.FireVignette.renderFireVignette == 2) {
-                            fireHud$renderTopLeftCorner(texture, context, width, height, var1, var2);
-                            fireHud$renderTopRightCorner(texture, context, width, height, var1, var2, var3);
-                        }
-                        if (FireHudConfig.FireVignette.renderFireVignette == 3) {
-                            fireHud$renderBottomLeftCorner(texture, context, width, height, var1, var2, var3);
-                            fireHud$renderBottomRightCorner(texture, context, width, height, var1, var2, var3);
+                        switch (FireHudConfig.FireVignette.renderFireVignette) {
+                            case 1:
+                                fireHud$renderTopLeftCorner(texture, context, width, height, var1, var2);
+                                fireHud$renderTopRightCorner(texture, context, width, height, var1, var2, var3);
+                                fireHud$renderBottomLeftCorner(texture, context, width, height, var1, var2, var3);
+                                fireHud$renderBottomRightCorner(texture, context, width, height, var1, var2, var3);
+                                break;
+                            case 2:
+                                fireHud$renderTopLeftCorner(texture, context, width, height, var1, var2);
+                                fireHud$renderTopRightCorner(texture, context, width, height, var1, var2, var3);
+                                break;
+                            case 3:
+                                fireHud$renderBottomLeftCorner(texture, context, width, height, var1, var2, var3);
+                                fireHud$renderBottomRightCorner(texture, context, width, height, var1, var2, var3);
                         }
                     }
                 }
@@ -188,9 +190,12 @@ public abstract class Mixin_InGameHud_Vignette {
         //$$  RenderSystem.depthMask(true);
         //$$  RenderSystem.enableDepthTest();
         //$$  context.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-        //#elseif MC >= 1.21.2
+        //#elseif MC >= 1.21.2 && MC <= 1.21.5
+        //$$ int i = ColorHelper.getWhite(opacity);
+        //$$ context.drawTexture(RenderLayer::getGuiTextured, texture, xPos, yPos, uStart, vStart, uEnd, vEnd, textureWidth, textureHeight, i);
+        //#elseif MC >= 1.21.6
         int i = ColorHelper.getWhite(opacity);
-        context.drawTexture(RenderLayer::getGuiTextured, texture, xPos, yPos, uStart, vStart, uEnd, vEnd, textureWidth, textureHeight, i);
+        context.drawTexture(RenderPipelines.GUI_TEXTURED, texture, xPos, yPos, uStart, vStart, uEnd, vEnd, textureWidth, textureHeight, i);
         //#endif
     }
     //#endif

@@ -48,14 +48,23 @@ public class Mixin_InGameOverlayRenderer_FirstPersonFireOverlay {
     @Unique private static final SpriteIdentifier SOUL_FIRE_1 = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, OmniIdentifier.create("block/soul_fire_1"));
     @Unique private static OmniRenderPipeline pipeline;
 
-    //#if MC >= 1.21.4
+    //#if MC >= 1.21.6
     @Inject(method = "renderOverlays", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameOverlayRenderer;renderFireOverlay(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;)V", shift = At.Shift.AFTER))
-    private static void fireHud$renderSideFireHUD(MinecraftClient client, MatrixStack matrices, VertexConsumerProvider vertexConsumers, CallbackInfo ci) {
+    private static void fireHud$renderSideFireHUD(boolean bl, float f, CallbackInfo ci) {
+    //#elseif MC >= 1.21.4 && MC <= 1.21.5
+    //$$ @Inject(method = "renderOverlays", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameOverlayRenderer;renderFireOverlay(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;)V", shift = At.Shift.AFTER))
+    //$$ private static void fireHud$renderSideFireHUD(MinecraftClient client, MatrixStack matrices, VertexConsumerProvider vertexConsumers, CallbackInfo ci) {
     //#else
     //$$ @Inject(method = "renderOverlays", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameOverlayRenderer;renderFireOverlay(Lnet/minecraft/client/MinecraftClient;Lnet/minecraft/client/util/math/MatrixStack;)V", shift = At.Shift.AFTER))
     //$$ private static void fireHud$renderSideFireHUD(MinecraftClient client, MatrixStack matrices, CallbackInfo ci) {
     //#endif
+        //#if MC >= 1.21.6
+        MinecraftClient client = OmniClient.getInstance();
+        //#endif
         if (FireHudConfig.FirstPersonFire.sideFire && fireHud$shouldRenderFire(client)){
+            //#if MC >= 1.21.6
+            MatrixStack matrices = new MatrixStack();
+            //#endif
             fireHud$renderSideFireOverlay(matrices);
         }
     }
@@ -144,7 +153,7 @@ public class Mixin_InGameOverlayRenderer_FirstPersonFireOverlay {
         float maxV = sprite.getMaxV();
         float midV = (minV + maxV) / 2.0f;
 
-        float animationFrameDelta = sprite.getAnimationFrameDelta();
+        float animationFrameDelta = sprite.getUvScaleDelta();
 
         float interpolatedU1 = MathHelper.lerp(animationFrameDelta, minU, midU);
         float interpolatedU2 = MathHelper.lerp(animationFrameDelta, maxU, midU);

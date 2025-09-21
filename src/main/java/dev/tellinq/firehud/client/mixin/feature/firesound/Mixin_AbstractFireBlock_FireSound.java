@@ -18,7 +18,7 @@ import net.minecraft.util.math.random.Random;
 @Mixin(AbstractFireBlock.class)
 public class Mixin_AbstractFireBlock_FireSound {
     
-    @Redirect(method = "randomDisplayTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;playSound(DDDLnet/minecraft/sound/SoundEvent;Lnet/minecraft/sound/SoundCategory;FFZ)V"))
+    @Redirect(method = "randomDisplayTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;playSoundClient(DDDLnet/minecraft/sound/SoundEvent;Lnet/minecraft/sound/SoundCategory;FFZ)V"))
     private void fireHud$fireSound(World world, double x, double y, double z, SoundEvent sound, SoundCategory category, float volume, float pitch, boolean useDistance) {
         float randomFl =
                 //#if MC > 1.18.2
@@ -27,6 +27,6 @@ public class Mixin_AbstractFireBlock_FireSound {
                 //$$ new Random().nextFloat();
                 //#endif
         
-        world.playSound(x, y, z, sound, category, (FireHudConfig.FireVolumePitch.fireVolume / 100f) + (FireHudConfig.FireVolumePitch.randomizeFireVolume ? randomFl : 0), (FireHudConfig.FireVolumePitch.randomizeFirePitch ? randomFl * 0.7f : 0) + (FireHudConfig.FireVolumePitch.firePitch / 100f), useDistance);
+        world.playSoundClient(x, y, z, sound, category, (FireHudConfig.FireVolumePitch.fireVolume / 100f) + (FireHudConfig.FireVolumePitch.randomizeFireVolume ? randomFl : 0), (FireHudConfig.FireVolumePitch.randomizeFirePitch ? randomFl * 0.7f : 0) + (FireHudConfig.FireVolumePitch.firePitch / 100f), useDistance);
     }
 }
