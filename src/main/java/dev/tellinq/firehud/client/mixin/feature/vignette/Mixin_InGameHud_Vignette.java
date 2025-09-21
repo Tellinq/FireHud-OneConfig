@@ -4,10 +4,10 @@ import dev.deftu.omnicore.client.OmniClient;
 import dev.deftu.omnicore.client.render.OmniResolution;
 import dev.tellinq.firehud.client.FireHud;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.RenderPipelines;
+
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
-import net.minecraft.client.render.RenderLayer;
+
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
@@ -19,6 +19,14 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+//#if MC >= 1.21.6
+import net.minecraft.client.gl.RenderPipelines;
+//#endif
+
+//#if MC >= 1.21.2 && MC < 1.21.6
+//$$ import net.minecraft.client.render.RenderLayer;
+//#endif
 
 //#if MC <= 1.21.1
 //$$ import com.mojang.blaze3d.systems.RenderSystem;
@@ -182,20 +190,20 @@ public abstract class Mixin_InGameHud_Vignette {
      */
     @Unique
     private void fireHud$renderOverlay(DrawContext context, Identifier texture, float opacity, int xPos, int yPos, int uStart, int vStart, int uEnd, int vEnd, int textureWidth, int textureHeight) {
-        //#if MC <= 1.21.1
-        //$$  RenderSystem.disableDepthTest();
-        //$$  RenderSystem.depthMask(false);
-        //$$  context.setShaderColor(1.0f, 1.0f, 1.0f, opacity);
-        //$$  context.drawTexture(texture, xPos, yPos, -90, uStart, vStart, uEnd, vEnd, textureWidth, textureHeight);
-        //$$  RenderSystem.depthMask(true);
-        //$$  RenderSystem.enableDepthTest();
-        //$$  context.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-        //#elseif MC >= 1.21.2 && MC <= 1.21.5
-        //$$ int i = ColorHelper.getWhite(opacity);
-        //$$ context.drawTexture(RenderLayer::getGuiTextured, texture, xPos, yPos, uStart, vStart, uEnd, vEnd, textureWidth, textureHeight, i);
-        //#elseif MC >= 1.21.6
+        //#if MC >= 1.21.6
         int i = ColorHelper.getWhite(opacity);
         context.drawTexture(RenderPipelines.GUI_TEXTURED, texture, xPos, yPos, uStart, vStart, uEnd, vEnd, textureWidth, textureHeight, i);
+        //#elseif MC >= 1.21.2
+        //$$ int i = ColorHelper.getWhite(opacity);
+        //$$ context.drawTexture(RenderLayer::getGuiTextured, texture, xPos, yPos, uStart, vStart, uEnd, vEnd, textureWidth, textureHeight, i);
+        //#elseif MC <= 1.21.1
+        //$$ RenderSystem.disableDepthTest();
+        //$$ RenderSystem.depthMask(false);
+        //$$ context.setShaderColor(1.0f, 1.0f, 1.0f, opacity);
+        //$$ context.drawTexture(texture, xPos, yPos, -90, uStart, vStart, uEnd, vEnd, textureWidth, textureHeight);
+        //$$ RenderSystem.depthMask(true);
+        //$$ RenderSystem.enableDepthTest();
+        //$$ context.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
         //#endif
     }
     //#endif
