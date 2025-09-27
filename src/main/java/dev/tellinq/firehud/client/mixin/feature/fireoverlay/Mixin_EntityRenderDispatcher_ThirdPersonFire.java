@@ -2,8 +2,8 @@ package dev.tellinq.firehud.client.mixin.feature.fireoverlay;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
-import dev.deftu.omnicore.client.OmniClientPlayer;
-import dev.deftu.omnicore.common.OmniIdentifier;
+import dev.deftu.omnicore.api.OmniIdentifier;
+import dev.deftu.omnicore.api.client.OmniClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
@@ -41,8 +41,8 @@ public
 abstract
 //#endif
 class Mixin_EntityRenderDispatcher_ThirdPersonFire {
-    @Unique private static final SpriteIdentifier SOUL_FIRE_0 = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, OmniIdentifier.create("block/soul_fire_0"));
-    @Unique private static final SpriteIdentifier SOUL_FIRE_1 = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, OmniIdentifier.create("block/soul_fire_1"));
+    @Unique private static final SpriteIdentifier SOUL_FIRE_0 = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, OmniIdentifier.createOrNull("block/soul_fire_0"));
+    @Unique private static final SpriteIdentifier SOUL_FIRE_1 = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, OmniIdentifier.createOrNull("block/soul_fire_1"));
     
     @Inject(method = "renderFire", at = @At(value = "HEAD"), cancellable = true)
     private void fireHud$renderThirdPersonFire(MatrixStack matrices, VertexConsumerProvider vertexConsumers,
@@ -55,7 +55,7 @@ class Mixin_EntityRenderDispatcher_ThirdPersonFire {
                                        Quaternionf rotation,
                                        //#endif
                                        CallbackInfo ci) {
-        ClientPlayerEntity player = OmniClientPlayer.getInstance();
+        ClientPlayerEntity player = OmniClient.getPlayer();
 
         if (player != null && player.isOnFire()) {
             if ((!FireHudConfig.ThirdPersonFire.whenInLava && player.isInLava())) ci.cancel();

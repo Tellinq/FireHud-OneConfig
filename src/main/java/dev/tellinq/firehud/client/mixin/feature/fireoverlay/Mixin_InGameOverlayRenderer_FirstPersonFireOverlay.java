@@ -2,19 +2,22 @@ package dev.tellinq.firehud.client.mixin.feature.fireoverlay;
 
 
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
-import dev.deftu.omnicore.client.OmniClient;
-import dev.deftu.omnicore.client.OmniClientPlayer;
-import dev.deftu.omnicore.client.render.OmniMatrixStack;
-import dev.deftu.omnicore.client.render.pipeline.DrawModes;
-import dev.deftu.omnicore.client.render.pipeline.OmniRenderPipeline;
-import dev.deftu.omnicore.client.render.pipeline.OmniRenderPipelineBuilder;
-import dev.deftu.omnicore.client.render.pipeline.VertexFormats;
-import dev.deftu.omnicore.client.render.state.OmniManagedBlendState;
-import dev.deftu.omnicore.client.render.vertex.OmniBufferBuilder;
-import dev.deftu.omnicore.common.OmniIdentifier;
+import dev.deftu.omnicore.api.OmniIdentifier;
+import dev.deftu.omnicore.api.client.OmniClient;
+import dev.deftu.omnicore.api.client.render.DefaultVertexFormats;
+import dev.deftu.omnicore.api.client.render.DrawMode;
+import dev.deftu.omnicore.api.client.render.pipeline.OmniRenderPipeline;
+import dev.deftu.omnicore.api.client.render.pipeline.OmniRenderPipelineBuilder;
+import dev.deftu.omnicore.api.client.render.pipeline.OmniRenderPipelines;
+import dev.deftu.omnicore.api.client.render.stack.OmniMatrixStack;
+import dev.deftu.omnicore.api.client.render.stack.OmniMatrixStacks;
+import dev.deftu.omnicore.api.client.render.state.OmniBlendState;
+import dev.deftu.omnicore.api.client.render.vertex.OmniBufferBuilder;
+import dev.deftu.omnicore.api.client.render.vertex.OmniBufferBuilders;
 import dev.tellinq.firehud.client.accessor.Accessor_SoulFireEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.InGameOverlayRenderer;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.model.ModelBaker;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.texture.SpriteAtlasTexture;
@@ -45,7 +48,7 @@ import net.minecraft.util.math.RotationAxis;
 
 @Mixin(InGameOverlayRenderer.class)
 public class Mixin_InGameOverlayRenderer_FirstPersonFireOverlay {
-    @Unique private static final SpriteIdentifier SOUL_FIRE_1 = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, OmniIdentifier.create("block/soul_fire_1"));
+    @Unique private static final SpriteIdentifier SOUL_FIRE_1 = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, OmniIdentifier.createOrNull("block/soul_fire_1"));
     @Unique private static OmniRenderPipeline pipeline;
 
     //#if MC >= 1.21.6
@@ -59,7 +62,7 @@ public class Mixin_InGameOverlayRenderer_FirstPersonFireOverlay {
     //$$ private static void fireHud$renderSideFireHUD(MinecraftClient client, MatrixStack matrices, CallbackInfo ci) {
     //#endif
         //#if MC >= 1.21.6
-        MinecraftClient client = OmniClient.getInstance();
+        MinecraftClient client = OmniClient.get();
         //#endif
         if (FireHudConfig.FirstPersonFire.sideFire && fireHud$shouldRenderFire(client)){
             //#if MC >= 1.21.6
@@ -80,7 +83,7 @@ public class Mixin_InGameOverlayRenderer_FirstPersonFireOverlay {
             return false;
         }
         //#if MC >= 1.21.4
-        MinecraftClient client = OmniClient.getInstance();
+        MinecraftClient client = OmniClient.get();
         //#endif
         return fireHud$shouldRenderFire(client);
     }
@@ -102,8 +105,9 @@ public class Mixin_InGameOverlayRenderer_FirstPersonFireOverlay {
     @ModifyArg(method = "renderFireOverlay", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/VertexConsumer;color(FFFF)Lnet/minecraft/client/render/VertexConsumer;"), index = 3)
     private static float fireHud$fireOpacity(float opacity) {
         float fireOpacity = FireHudConfig.FirstPersonFire.opacity / 100F;
-        if (OmniClientPlayer.getInstance().hasStatusEffect(StatusEffects.FIRE_RESISTANCE)) {
-            int duration = OmniClientPlayer.getInstance().getStatusEffect(StatusEffects.FIRE_RESISTANCE).getDuration();
+        ClientPlayerEntity player = OmniClient.getPlayer();
+        if (player.hasStatusEffect(StatusEffects.FIRE_RESISTANCE)) {
+            int duration = player.getStatusEffect(StatusEffects.FIRE_RESISTANCE).getDuration();
             fireOpacity *= duration > 100 ? 1.0F : 0.5F - MathHelper.sin(((float)duration - 0) * (float)Math.PI * 0.2F) * 0.5F;
         }
         return fireOpacity;
@@ -133,7 +137,8 @@ public class Mixin_InGameOverlayRenderer_FirstPersonFireOverlay {
 
     @Redirect(method = "renderFireOverlay", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/SpriteIdentifier;getSprite()Lnet/minecraft/client/texture/Sprite;"))
     private static Sprite fireHud$getSprite(SpriteIdentifier instance) {
-        if (FireHudConfig.renderSoulFire && OmniClientPlayer.getInstance() != null && ((Accessor_SoulFireEntity) OmniClientPlayer.getInstance()).fireHud$isOnSoulFire()) {
+        ClientPlayerEntity player = OmniClient.getPlayer();
+        if (FireHudConfig.renderSoulFire && player != null && ((Accessor_SoulFireEntity) player).fireHud$isOnSoulFire()) {
             return SOUL_FIRE_1.getSprite();
         }
 
@@ -176,14 +181,14 @@ public class Mixin_InGameOverlayRenderer_FirstPersonFireOverlay {
             //$$ matrices.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion((r == 1 ? -10.0f : 10.0f)));
             //#endif
 
-            OmniMatrixStack omniMatrixStack = OmniMatrixStack.vanilla(matrices);
-            OmniBufferBuilder bufferBuilder = OmniBufferBuilder.create(DrawModes.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
+            OmniMatrixStack omniMatrixStack = OmniMatrixStacks.vanilla(matrices);
+            OmniBufferBuilder bufferBuilder = OmniBufferBuilders.create(DrawMode.QUADS, DefaultVertexFormats.POSITION_TEXTURE_COLOR);
 
             bufferBuilder.vertex(omniMatrixStack, -0.5f, -0.5f, -0.5f).texture(interpolatedU2, interpolatedV2).color(1.0f, 1.0f, 1.0f, fireOpacity).next();
             bufferBuilder.vertex(omniMatrixStack, 0.5f, -0.5f, -0.5f).texture(interpolatedU1, interpolatedV2).color(1.0f, 1.0f, 1.0f, fireOpacity).next();
             bufferBuilder.vertex(omniMatrixStack, 0.5f, 0.5f, -0.5f).texture(interpolatedU1, interpolatedV1).color(1.0f, 1.0f, 1.0f, fireOpacity).next();
             bufferBuilder.vertex(omniMatrixStack, -0.5f, 0.5f, -0.5f).texture(interpolatedU2, interpolatedV1).color(1.0f, 1.0f, 1.0f, fireOpacity).next();
-            bufferBuilder.build().drawWithCleanup(getPipeline(), f -> {});
+            bufferBuilder.buildOrNull().draw(getPipeline(), f -> {});
 
             matrices.pop();
         }
@@ -192,12 +197,12 @@ public class Mixin_InGameOverlayRenderer_FirstPersonFireOverlay {
     @Unique
     private static OmniRenderPipeline getPipeline() {
         if (pipeline == null) {
-            OmniRenderPipelineBuilder builder = OmniRenderPipeline.builderWithDefaultShader(
-                    OmniIdentifier.create("block/soul_fire_1"),
-                    VertexFormats.POSITION_TEXTURE_COLOR,
-                    DrawModes.QUADS
+            OmniRenderPipelineBuilder builder = OmniRenderPipelines.builderWithDefaultShader(
+                    OmniIdentifier.createOrNull("block/soul_fire_1"),
+                    DefaultVertexFormats.POSITION_TEXTURE_COLOR,
+                    DrawMode.QUADS
             );
-            builder.blendState = OmniManagedBlendState.NORMAL;
+            builder.blendState = OmniBlendState.NORMAL;
 
             pipeline = builder.build();
         }

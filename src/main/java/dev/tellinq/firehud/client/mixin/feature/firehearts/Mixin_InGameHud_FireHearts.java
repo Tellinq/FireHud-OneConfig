@@ -1,11 +1,10 @@
 package dev.tellinq.firehud.client.mixin.feature.firehearts;
 
 
-import dev.deftu.omnicore.client.OmniClient;
+import dev.deftu.omnicore.api.client.OmniClient;
 import dev.tellinq.firehud.client.FireHud;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.CampfireBlock;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.EquipmentSlot;
@@ -72,8 +71,7 @@ public abstract class Mixin_InGameHud_FireHearts {
             )
     )
     private Identifier fireHud$redirectHeartTexture(InGameHud.HeartType originalType, boolean hardcore, boolean blinking, boolean half) {
-        MinecraftClient client = OmniClient.getInstance();
-        if (client.cameraEntity instanceof PlayerEntity player) {
+        if (OmniClient.getCamera() instanceof PlayerEntity player) {
             if (originalType == InGameHud.HeartType.NORMAL) {
                 if (fireHud$shouldRenderSoulFireHeart(player) && fireHud$shouldRenderFireHeart(player)) {
                     return fireHud$getSoulFireHeartTexture(hardcore, half, blinking);

@@ -1,7 +1,19 @@
 package dev.tellinq.firehud.client.mixin.feature.vignette;
 
-import dev.deftu.omnicore.client.OmniClient;
-import dev.deftu.omnicore.client.render.OmniResolution;
+
+import dev.deftu.omnicore.api.OmniIdentifier;
+import dev.deftu.omnicore.api.client.OmniClient;
+import dev.deftu.omnicore.api.client.render.DefaultVertexFormats;
+import dev.deftu.omnicore.api.client.render.DrawMode;
+import dev.deftu.omnicore.api.client.render.OmniRenderingContext;
+import dev.deftu.omnicore.api.client.render.OmniResolution;
+import dev.deftu.omnicore.api.client.render.pipeline.OmniRenderPipeline;
+import dev.deftu.omnicore.api.client.render.pipeline.OmniRenderPipelineBuilder;
+import dev.deftu.omnicore.api.client.render.pipeline.OmniRenderPipelineSnippets;
+import dev.deftu.omnicore.api.client.render.pipeline.OmniRenderPipelines;
+import dev.deftu.omnicore.api.client.render.state.OmniBlendState;
+import dev.deftu.omnicore.api.color.OmniColor;
+import dev.deftu.omnicore.api.color.OmniColors;
 import dev.tellinq.firehud.client.FireHud;
 import net.minecraft.client.MinecraftClient;
 
@@ -74,6 +86,8 @@ public abstract class Mixin_InGameHud_Vignette {
     @Unique private static final Identifier FIRE_VIGNETTE = FireHud.getFireHudResource("textures/fire/fire_vignette.png");
     @Unique private static final Identifier SOUL_FIRE_VIGNETTE = FireHud.getFireHudResource("textures/fire/soul_fire_vignette.png");
 
+    @Unique private static OmniRenderPipeline pipeline;
+
     /**
      * Helper method to determine if the HUD vignette should be scaled to a specific value, based on configuration
      * and the current GUI scale. Used to adjust the size of the fire vignette overlay.
@@ -83,7 +97,7 @@ public abstract class Mixin_InGameHud_Vignette {
     @Unique
     private boolean fireHud$scaleHelper(int scale) {
         int hudScale = FireHudConfig.FireVignette.scale;
-        int guiScale = OmniClient.getInstance().options.getGuiScale().getValue();
+        int guiScale = OmniClient.get().options.getGuiScale().getValue();
         return hudScale == scale || hudScale == 0 && guiScale == scale;
     }
 
@@ -111,7 +125,7 @@ public abstract class Mixin_InGameHud_Vignette {
                         //$$ float tickDelta,
                         //#endif
                         CallbackInfo ci) {
-        MinecraftClient client = OmniClient.getInstance();
+        MinecraftClient client = OmniClient.get();
         PlayerEntity player = client.player;
 
         Identifier texture = player != null && ((Accessor_SoulFireEntity) player).fireHud$isOnSoulFire() ? SOUL_FIRE_VIGNETTE : FIRE_VIGNETTE;
@@ -153,7 +167,7 @@ public abstract class Mixin_InGameHud_Vignette {
      */
     @Unique
     private void fireHud$renderTopLeftCorner(Identifier texture, DrawContext context, int width, int height, int var1, int var2) {
-        fireHud$renderOverlay(context, texture, FireHudConfig.FireVignette.opacity / 100f, 0, 0, 0, 0, width / var2, height / var2, width / var1, height / var1);
+        fireHud$renderOverlay(context, texture, (int)(FireHudConfig.FireVignette.opacity * 2.55f), 0, 0, 0, 0, width / var2, height / var2, width / var1, height / var1);
     }
 
     /**
@@ -162,7 +176,7 @@ public abstract class Mixin_InGameHud_Vignette {
      */
     @Unique
     private void fireHud$renderTopRightCorner(Identifier texture, DrawContext context, int width, int height, int var1, int var2, int var3) {
-        fireHud$renderOverlay(context, texture, FireHudConfig.FireVignette.opacity / 100f, (width / var2) * var3, 0, width / var2, 0, width, height / var2, width / var1, height / var1);
+        fireHud$renderOverlay(context, texture, (int)(FireHudConfig.FireVignette.opacity * 2.55f), (width / var2) * var3, 0, width / var2, 0, width, height / var2, width / var1, height / var1);
     }
 
     /**
@@ -171,7 +185,7 @@ public abstract class Mixin_InGameHud_Vignette {
      */
     @Unique
     private void fireHud$renderBottomLeftCorner(Identifier texture, DrawContext context, int width, int height, int var1, int var2, int var3) {
-        fireHud$renderOverlay(context, texture, FireHudConfig.FireVignette.opacity / 100f, 0, (height / var2) * var3, 0, height / var2, width / var2, height, width / var1, height / var1);
+        fireHud$renderOverlay(context, texture, (int)(FireHudConfig.FireVignette.opacity * 2.55f), 0, (height / var2) * var3, 0, height / var2, width / var2, height, width / var1, height / var1);
     }
 
     /**
@@ -180,7 +194,7 @@ public abstract class Mixin_InGameHud_Vignette {
      */
     @Unique
     private void fireHud$renderBottomRightCorner(Identifier texture, DrawContext context, int width, int height, int var1, int var2, int var3) {
-        fireHud$renderOverlay(context, texture, FireHudConfig.FireVignette.opacity / 100f, (width / var2) * var3, (height / var2) * var3, width / var2, height / var2, width, height, width / var1, height / var1);
+        fireHud$renderOverlay(context, texture, (int)(FireHudConfig.FireVignette.opacity * 2.55f), (width / var2) * var3, (height / var2) * var3, width / var2, height / var2, width, height, width / var1, height / var1);
     }
     
     /**
@@ -189,22 +203,46 @@ public abstract class Mixin_InGameHud_Vignette {
      * Used by the vignette corner rendering methods.
      */
     @Unique
-    private void fireHud$renderOverlay(DrawContext context, Identifier texture, float opacity, int xPos, int yPos, int uStart, int vStart, int uEnd, int vEnd, int textureWidth, int textureHeight) {
+    private void fireHud$renderOverlay(DrawContext context, Identifier texture, int opacity, int xPos, int yPos, int uStart, int vStart, int uEnd, int vEnd, int textureWidth, int textureHeight) {
         //#if MC >= 1.21.6
         int i = ColorHelper.getWhite(opacity);
         context.drawTexture(RenderPipelines.GUI_TEXTURED, texture, xPos, yPos, uStart, vStart, uEnd, vEnd, textureWidth, textureHeight, i);
         //#elseif MC >= 1.21.2
         //$$ int i = ColorHelper.getWhite(opacity);
-        //$$ context.drawTexture(RenderLayer::getGuiTextured, texture, xPos, yPos, uStart, vStart, uEnd, vEnd, textureWidth, textureHeight, i);
+        //$$ context.drawTexture(RenderLayer::getGuiTextured, texture, xPos, yPos, uStart, vStart, uEnd, vEnd, textureWidth, textureHeight, OmniColors.WHITE.withAlpha(opacity).getValue());
         //#elseif MC <= 1.21.1
         //$$ RenderSystem.disableDepthTest();
         //$$ RenderSystem.depthMask(false);
-        //$$ context.setShaderColor(1.0f, 1.0f, 1.0f, opacity);
+        //$$ context.setShaderColor(1.0f, 1.0f, 1.0f, FireHudConfig.FireVignette.opacity / 100f);
         //$$ context.drawTexture(texture, xPos, yPos, -90, uStart, vStart, uEnd, vEnd, textureWidth, textureHeight);
         //$$ RenderSystem.depthMask(true);
         //$$ RenderSystem.enableDepthTest();
         //$$ context.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
         //#endif
+
+//        float u = (float) (uStart + uEnd) / (textureWidth/2f);
+//        float v = (float) (vStart + vEnd) / (textureHeight/2f);
+//
+//
+//        OmniRenderingContext context1 = OmniRenderingContext.from(context);
+//        context1.renderTexture(getPipeline(), texture, xPos, yPos, textureWidth, textureHeight, u, v, OmniColors.WHITE.withAlpha(opacity));
     }
     //#endif
+
+
+
+    private static OmniRenderPipeline getPipeline() {
+        if (pipeline == null) {
+
+            OmniRenderPipelineBuilder builder = OmniRenderPipelines.builderWithDefaultShader(
+                    OmniIdentifier.createOrNull("pipeline/gui_textured"),
+                    DefaultVertexFormats.POSITION_TEXTURE_COLOR,
+                    DrawMode.QUADS
+            );
+            builder.applySnippet(OmniRenderPipelineSnippets.POSITION_TEXTURE_COLOR);
+
+            pipeline = builder.build();
+        }
+        return pipeline;
+    }
 }
