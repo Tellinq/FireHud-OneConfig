@@ -1,6 +1,6 @@
 package dev.tellinq.firehud.client;
 
-import dev.deftu.omnicore.common.OmniIdentifier;
+import dev.deftu.omnicore.api.OmniIdentifier;
 import dev.tellinq.firehud.FireHudConstants;
 import dev.tellinq.firehud.client.hud.FireResistanceTimer;
 import net.minecraft.util.Identifier;
@@ -19,6 +19,6 @@ public class FireHud {
     }
 
     public static Identifier getFireHudResource(String path) {
-        return OmniIdentifier.create(FireHudConstants.ID, path);
+        return OmniIdentifier.createOrNull(FireHudConstants.ID, path);
     }
 }

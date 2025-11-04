@@ -1,7 +1,8 @@
 package dev.tellinq.firehud.client.mixin.feature.firetint;
 
-import dev.deftu.omnicore.client.OmniClient;
-import dev.deftu.omnicore.client.render.OmniResolution;
+import dev.deftu.omnicore.api.client.OmniClient;
+import dev.deftu.omnicore.api.client.options.OmniPerspective;
+import dev.deftu.omnicore.api.client.render.OmniResolution;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
@@ -47,15 +48,14 @@ public class Mixin_InGameHud_FireTint {
             //$$ float tickDelta,
             //#endif
             CallbackInfo ci) {
-        MinecraftClient client = OmniClient.getInstance();
-        PlayerEntity player = client.player;
+        PlayerEntity player = OmniClient.getPlayer();
 
         if (player == null) return;
 
         int width = OmniResolution.getScaledWidth();
         int height = OmniResolution.getScaledHeight();
 
-        boolean isFirstPerson = client.options.getPerspective().isFirstPerson();
+        boolean isFirstPerson = OmniPerspective.getCurrentPerspective().isFirstPerson();
         boolean isOnFire = player.isOnFire();
         boolean isInLava = player.isInLava();
         boolean hasFireResistance = player.hasStatusEffect(StatusEffects.FIRE_RESISTANCE);

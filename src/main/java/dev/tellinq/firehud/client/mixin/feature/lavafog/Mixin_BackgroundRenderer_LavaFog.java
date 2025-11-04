@@ -1,59 +1,86 @@
 package dev.tellinq.firehud.client.mixin.feature.lavafog;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import net.minecraft.client.render.BackgroundRenderer;
-import net.minecraft.client.render.Camera;
+//#if MC >= 1.21.6
+import net.minecraft.client.render.RenderTickCounter;
+import net.minecraft.client.render.fog.FogData;
+import net.minecraft.client.render.fog.LavaFogModifier;
+import net.minecraft.client.world.ClientWorld;
+//#endif
+//#if MC <= 1.21.5
+//$$ import net.minecraft.client.render.BackgroundRenderer;
+//$$ import net.minecraft.client.render.Camera;
+//#endif
 import net.minecraft.entity.Entity;
 import dev.tellinq.firehud.client.config.FireHudConfig;
+//#if MC >= 1.21.6
+import net.minecraft.util.math.BlockPos;
+//#endif
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.*;
 
-//#if MC >= 1.21.2
-import net.minecraft.client.render.Fog;
-import org.joml.Vector4f;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+//#if MC >= 1.21.2 && MC <= 1.21.5
+//$$ import net.minecraft.client.render.Fog;
+//$$ import org.joml.Vector4f;
+//$$ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 //#endif
 
-//#if MC <= 1.21.1
-//$$ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+//#if MC <= 1.21.1 || MC >= 1.21.6
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 //#endif
 
-@Mixin(BackgroundRenderer.class)
+//#if MC >= 1.21.6
+@Mixin(LavaFogModifier.class)
+//#else
+//$$ @Mixin(BackgroundRenderer.class)
+//#endif
 public class Mixin_BackgroundRenderer_LavaFog {
 
     @Unique
     private static float capturedViewDistance;
 
     @Inject(method =
-            //#if MC > 1.17.1
-            "applyFog"
+            //#if MC >= 1.21.6
+            "applyStartEndModifier"
+            //#elseif MC > 1.17.1
+            //$$ "applyFog"
             //#else
             //$$ "setupFog(Lnet/minecraft/client/Camera;Lnet/minecraft/client/renderer/FogRenderer$FogMode;FZ)V"
             //#endif
             , at = @At("HEAD"))
-    private static void captureViewDistance(Camera camera,
-                                            BackgroundRenderer.FogType fogType,
-                                            //#if MC >= 1.21.2
-                                            Vector4f color,
-                                            //#endif
-                                            float viewDistance,
-                                            boolean thickenFog,
-                                            //#if MC >= 1.19
-                                            float tickDelta,
-                                            //#endif
-                                            //#if MC >= 1.21.2
-                                            CallbackInfoReturnable<Fog> cir
-                                            //#elseif MC <= 1.21.1
-                                            //$$ CallbackInfo ci
-                                            //#endif
-    ) {
-        capturedViewDistance = viewDistance;
+    //#if MC <= 1.21.5
+    //$$ private static void captureViewDistance(Camera camera,
+    //$$                                         BackgroundRenderer.FogType fogType,
+    //$$                                         //#if MC >= 1.21.2
+    //$$                                         Vector4f color,
+    //$$                                         //#endif
+    //$$                                         float viewDistance,
+    //$$                                         boolean thickenFog,
+    //$$                                         //#if MC >= 1.19
+    //$$                                         float tickDelta,
+    //$$                                         //#endif
+    //$$                                         //#if MC >= 1.21.2 && MC <= 1.21.5
+    //$$                                         CallbackInfoReturnable<Fog> cir
+    //$$                                         //#elseif MC <= 1.21.1
+    //$$                                         //$$ CallbackInfo ci
+    //$$                                         //#endif
+    //$$ ) {
+    //#else
+    private static void captureViewDistance(FogData fogData, Entity entity, BlockPos blockPos, ClientWorld clientWorld, float f, RenderTickCounter renderTickCounter, CallbackInfo ci) {
+    //#endif
+        //#if MC >= 1.21.6
+        capturedViewDistance = f;
+        //#else
+        //$$ capturedViewDistance = viewDistance;
+        //#endif
     }
 
     @Redirect(method =
-            //#if MC > 1.17.1
-            "applyFog"
+            //#if MC >= 1.21.6
+            "applyStartEndModifier"
+            //#elseif MC > 1.17.1
+            //$$ "applyFog"
             //#else
             //$$ "setupFog(Lnet/minecraft/client/Camera;Lnet/minecraft/client/renderer/FogRenderer$FogMode;FZ)V"
             //#endif
@@ -64,8 +91,10 @@ public class Mixin_BackgroundRenderer_LavaFog {
 
     @ModifyExpressionValue(
             method =
-                    //#if MC > 1.17.1
-                    "applyFog"
+            //#if MC >= 1.21.6
+            "applyStartEndModifier"
+            //#elseif MC > 1.17.1
+            //$$ "applyFog"
             //#else
             //$$ "setupFog(Lnet/minecraft/client/Camera;Lnet/minecraft/client/renderer/FogRenderer$FogMode;FZ)V"
             //#endif
@@ -80,8 +109,10 @@ public class Mixin_BackgroundRenderer_LavaFog {
     }
 
     @ModifyExpressionValue(method =
-            //#if MC > 1.17.1
-            "applyFog"
+            //#if MC >= 1.21.6
+            "applyStartEndModifier"
+            //#elseif MC > 1.17.1
+            //$$ "applyFog"
             //#else
             //$$ "setupFog(Lnet/minecraft/client/Camera;Lnet/minecraft/client/renderer/FogRenderer$FogMode;FZ)V"
             //#endif
@@ -93,35 +124,37 @@ public class Mixin_BackgroundRenderer_LavaFog {
         return original;
     }
 
-    @Inject(method =
-            //#if MC > 1.17.1
-            "applyFog"
-            //#else
-            //$$ "setupFog(Lnet/minecraft/client/Camera;Lnet/minecraft/client/renderer/FogRenderer$FogMode;FZ)V"
-            //#endif
-            , at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;isSpectator()Z", ordinal = 0), cancellable = true)
-    private static void applyFog(Camera camera,
-                                 BackgroundRenderer.FogType fogType,
-                                 //#if MC >= 1.21.2
-                                 Vector4f color,
-                                 //#endif
-                                 float viewDistance,
-                                 boolean thickenFog,
-                                 //#if MC >= 1.19
-                                 float tickDelta,
-                                 //#endif
-                                 //#if MC >= 1.21.2
-                                 CallbackInfoReturnable<Fog> cir
-                                 //#elseif MC <= 1.21.1
-                                 //$$ CallbackInfo ci
-                                 //#endif
-    ) {
-        if (FireHudConfig.Lava.renderLavaFog == 2) {
-            //#if MC >= 1.21.2
-            cir.setReturnValue(Fog.DUMMY);
-            //#elseif MC <= 1.21.1
-            //$$ ci.cancel();
-            //#endif
-        }
-    }
+    //#if MC <= 1.21.5
+    //$$ @Inject(method =
+    //$$         //#if MC > 1.17.1 && MC <= 1.21.5
+    //$$         "applyFog"
+    //$$         //#else
+    //$$         //$$ "setupFog(Lnet/minecraft/client/Camera;Lnet/minecraft/client/renderer/FogRenderer$FogMode;FZ)V"
+    //$$         //#endif
+    //$$         , at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;isSpectator()Z", ordinal = 0), cancellable = true)
+    //$$ private static void applyFog(Camera camera,
+    //$$                              BackgroundRenderer.FogType fogType,
+    //$$                              //#if MC >= 1.21.2
+    //$$                              Vector4f color,
+    //$$                              //#endif
+    //$$                              float viewDistance,
+    //$$                              boolean thickenFog,
+    //$$                              //#if MC >= 1.19
+    //$$                              float tickDelta,
+    //$$                              //#endif
+    //$$                              //#if MC >= 1.21.2 && MC <= 1.21.5
+    //$$                              CallbackInfoReturnable<Fog> cir
+    //$$                              //#elseif MC <= 1.21.1
+    //$$                              //$$ CallbackInfo ci
+    //$$                              //#endif
+    //$$ ) {
+    //$$     if (FireHudConfig.Lava.renderLavaFog == 2) {
+    //$$         //#if MC >= 1.21.2 && MC <= 1.21.5
+    //$$         cir.setReturnValue(Fog.DUMMY);
+    //$$         //#elseif MC <= 1.21.1
+    //$$         //$$ ci.cancel();
+    //$$         //#endif
+    //$$     }
+    //$$ }
+    //#endif
 }

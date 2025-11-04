@@ -161,7 +161,13 @@ public class FireHudConfig extends Config {
         @RadioButton(
                 title = "Render Lava Fog",
                 description = "Toggles rendering the fog effect when in lava, making it easier to see",
-                options = {"Vanilla",  "Light Fog", "No Fog"}
+                options = {
+                        "Vanilla",
+                        "Light Fog",
+                        //#if MC <= 1.21.5
+                        //$$ "No Fog"
+                        //#endif
+                }
         )
         public static int renderLavaFog = 0;
 

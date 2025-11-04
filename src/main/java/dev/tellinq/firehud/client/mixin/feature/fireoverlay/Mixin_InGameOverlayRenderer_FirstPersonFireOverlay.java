@@ -2,12 +2,22 @@ package dev.tellinq.firehud.client.mixin.feature.fireoverlay;
 
 
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
-import dev.deftu.omnicore.client.OmniClient;
-import dev.deftu.omnicore.client.OmniClientPlayer;
-import dev.deftu.omnicore.common.OmniIdentifier;
+import dev.deftu.omnicore.api.OmniIdentifier;
+import dev.deftu.omnicore.api.client.OmniClient;
+import dev.deftu.omnicore.api.client.render.DefaultVertexFormats;
+import dev.deftu.omnicore.api.client.render.DrawMode;
+import dev.deftu.omnicore.api.client.render.pipeline.OmniRenderPipeline;
+import dev.deftu.omnicore.api.client.render.pipeline.OmniRenderPipelineBuilder;
+import dev.deftu.omnicore.api.client.render.pipeline.OmniRenderPipelines;
+import dev.deftu.omnicore.api.client.render.stack.OmniMatrixStack;
+import dev.deftu.omnicore.api.client.render.stack.OmniMatrixStacks;
+import dev.deftu.omnicore.api.client.render.state.OmniBlendState;
+import dev.deftu.omnicore.api.client.render.vertex.OmniBufferBuilder;
+import dev.deftu.omnicore.api.client.render.vertex.OmniBufferBuilders;
 import dev.tellinq.firehud.client.accessor.Accessor_SoulFireEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.InGameOverlayRenderer;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.model.ModelBaker;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.texture.SpriteAtlasTexture;
@@ -28,69 +38,52 @@ import java.util.Objects;
 
 //#if MC >= 1.21.4
 import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.RenderLayer;
-//#endif
-
-//#if MC <= 1.21.3
-//$$ import com.mojang.blaze3d.systems.RenderSystem;
-//$$ import net.minecraft.client.render.BufferBuilder;
-//$$ import net.minecraft.client.render.VertexFormat;
-//$$ import net.minecraft.client.render.VertexFormats;
-//$$ import net.minecraft.client.render.Tessellator;
-//$$ import net.minecraft.client.render.BufferRenderer;
-//#endif
-
-//#if MC >= 1.21.2 && MC <= 1.21.3
-//$$ import net.minecraft.client.gl.ShaderProgramKeys;
-//#endif
-
-//#if MC <= 1.21.1
-//$$ import net.minecraft.client.render.GameRenderer;
 //#endif
 
 //#if MC > 1.19.2
-import org.joml.Matrix4f;
 import net.minecraft.util.math.RotationAxis;
 //#else
-//$$ import net.minecraft.util.math.Matrix4f;
 //$$ import net.minecraft.util.math.Vec3f;
 //#endif
 
 @Mixin(InGameOverlayRenderer.class)
 public class Mixin_InGameOverlayRenderer_FirstPersonFireOverlay {
-    @Unique private static final SpriteIdentifier SOUL_FIRE_1 = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, OmniIdentifier.create("block/soul_fire_1"));
+    @Unique private static final SpriteIdentifier SOUL_FIRE_1 = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, OmniIdentifier.createOrNull("block/soul_fire_1"));
+    @Unique private static OmniRenderPipeline pipeline;
 
+    //#if MC >= 1.21.6
     @Inject(method = "renderOverlays", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameOverlayRenderer;renderFireOverlay(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;)V", shift = At.Shift.AFTER))
-    private static void fireHud$renderSideFireHUD(MinecraftClient client, MatrixStack matrices,
-                                          //#if MC >= 1.21.4
-                                          VertexConsumerProvider vertexConsumers,
-                                          //#endif
-                                          CallbackInfo ci) {
+    private static void fireHud$renderSideFireHUD(boolean bl, float f, CallbackInfo ci) {
+    //#elseif MC >= 1.21.4 && MC <= 1.21.5
+    //$$ @Inject(method = "renderOverlays", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameOverlayRenderer;renderFireOverlay(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;)V", shift = At.Shift.AFTER))
+    //$$ private static void fireHud$renderSideFireHUD(MinecraftClient client, MatrixStack matrices, VertexConsumerProvider vertexConsumers, CallbackInfo ci) {
+    //#else
+    //$$ @Inject(method = "renderOverlays", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameOverlayRenderer;renderFireOverlay(Lnet/minecraft/client/MinecraftClient;Lnet/minecraft/client/util/math/MatrixStack;)V", shift = At.Shift.AFTER))
+    //$$ private static void fireHud$renderSideFireHUD(MinecraftClient client, MatrixStack matrices, CallbackInfo ci) {
+    //#endif
+        //#if MC >= 1.21.6
+        MinecraftClient client = OmniClient.get();
+        //#endif
         if (FireHudConfig.FirstPersonFire.sideFire && fireHud$shouldRenderFire(client)){
-            fireHud$renderSideFireOverlay(matrices
-                    //#if MC >= 1.21.4
-                    , vertexConsumers
-                    //#endif
-            );
+            //#if MC >= 1.21.6
+            MatrixStack matrices = new MatrixStack();
+            //#endif
+            fireHud$renderSideFireOverlay(matrices);
         }
     }
 
+    //#if MC >= 1.21.4
     @WrapWithCondition(method = "renderOverlays", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameOverlayRenderer;renderFireOverlay(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;)V"))
-    private static boolean fireHud$shouldRenderFirstPersonFire(
-            //#if MC <= 1.21.3
-            //$$ MinecraftClient client,
-            //#endif
-            MatrixStack matrices
-            //#if MC >= 1.21.4
-            , VertexConsumerProvider vertexConsumers
-            //#endif
-    ) {
+    private static boolean fireHud$shouldRenderFirstPersonFire(MatrixStack matrices, VertexConsumerProvider vertexConsumers) {
+    //#elseif MC <= 1.21.3
+    //$$ @WrapWithCondition(method = "renderOverlays", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameOverlayRenderer;renderFireOverlay(Lnet/minecraft/client/MinecraftClient;Lnet/minecraft/client/util/math/MatrixStack;)V"))
+    //$$ private static boolean fireHud$shouldRenderFirstPersonFire(MinecraftClient client, MatrixStack matrices) {
+    //#endif
         if (!FireHudConfig.FirstPersonFire.enabled) {
             return false;
         }
         //#if MC >= 1.21.4
-        MinecraftClient client = OmniClient.getInstance();
+        MinecraftClient client = OmniClient.get();
         //#endif
         return fireHud$shouldRenderFire(client);
     }
@@ -112,8 +105,9 @@ public class Mixin_InGameOverlayRenderer_FirstPersonFireOverlay {
     @ModifyArg(method = "renderFireOverlay", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/VertexConsumer;color(FFFF)Lnet/minecraft/client/render/VertexConsumer;"), index = 3)
     private static float fireHud$fireOpacity(float opacity) {
         float fireOpacity = FireHudConfig.FirstPersonFire.opacity / 100F;
-        if (OmniClientPlayer.getInstance().hasStatusEffect(StatusEffects.FIRE_RESISTANCE)) {
-            int duration = OmniClientPlayer.getInstance().getStatusEffect(StatusEffects.FIRE_RESISTANCE).getDuration();
+        ClientPlayerEntity player = OmniClient.getPlayer();
+        if (player.hasStatusEffect(StatusEffects.FIRE_RESISTANCE)) {
+            int duration = player.getStatusEffect(StatusEffects.FIRE_RESISTANCE).getDuration();
             fireOpacity *= duration > 100 ? 1.0F : 0.5F - MathHelper.sin(((float)duration - 0) * (float)Math.PI * 0.2F) * 0.5F;
         }
         return fireOpacity;
@@ -143,7 +137,8 @@ public class Mixin_InGameOverlayRenderer_FirstPersonFireOverlay {
 
     @Redirect(method = "renderFireOverlay", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/SpriteIdentifier;getSprite()Lnet/minecraft/client/texture/Sprite;"))
     private static Sprite fireHud$getSprite(SpriteIdentifier instance) {
-        if (FireHudConfig.renderSoulFire && OmniClientPlayer.getInstance() != null && ((Accessor_SoulFireEntity) OmniClientPlayer.getInstance()).fireHud$isOnSoulFire()) {
+        ClientPlayerEntity player = OmniClient.getPlayer();
+        if (FireHudConfig.renderSoulFire && player != null && ((Accessor_SoulFireEntity) player).fireHud$isOnSoulFire()) {
             return SOUL_FIRE_1.getSprite();
         }
 
@@ -152,37 +147,8 @@ public class Mixin_InGameOverlayRenderer_FirstPersonFireOverlay {
 
 
     @Unique
-    private static void fireHud$renderSideFireOverlay(MatrixStack matrices
-                                                      //#if MC >= 1.21.4
-                                                      , VertexConsumerProvider vertexConsumers
-                                                      //#endif
-    ) {
-        //#if MC > 1.19.2
-        //#if MC < 1.21
-        //$$  BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-        //#endif
-        //#if MC <= 1.21.3
-        //$$  RenderSystem.setShader(
-                //#if MC < 1.21
-                //$$  GameRenderer::getPositionColorTexProgram
-                //#elseif MC >= 1.21 && MC <= 1.21.1
-                //$$  GameRenderer::getPositionTexColorProgram
-                //#elseif MC >= 1.21.2
-                //$$  ShaderProgramKeys.POSITION_TEX_COLOR
-                //#endif
-        //$$  );
-        //$$  RenderSystem.depthFunc(519);
-        //$$  RenderSystem.depthMask(false);
-        //$$  RenderSystem.enableBlend();
-        //#endif
+    private static void fireHud$renderSideFireOverlay(MatrixStack matrices) {
         Sprite sprite = fireHud$getSprite(ModelBaker.FIRE_1);
-        //#if MC <= 1.21.3
-        //$$  RenderSystem.setShaderTexture(0, sprite.getAtlasId());
-        //#endif
-
-        //#if MC >= 1.21.4
-        VertexConsumer vertexConsumer = vertexConsumers.getBuffer(RenderLayer.getFireScreenEffect(sprite.getAtlasId()));
-        //#endif
 
         float minU = sprite.getMinU();
         float maxU = sprite.getMaxU();
@@ -192,7 +158,7 @@ public class Mixin_InGameOverlayRenderer_FirstPersonFireOverlay {
         float maxV = sprite.getMaxV();
         float midV = (minV + maxV) / 2.0f;
 
-        float animationFrameDelta = sprite.getAnimationFrameDelta();
+        float animationFrameDelta = sprite.getUvScaleDelta();
 
         float interpolatedU1 = MathHelper.lerp(animationFrameDelta, minU, midU);
         float interpolatedU2 = MathHelper.lerp(animationFrameDelta, maxU, midU);
@@ -215,37 +181,32 @@ public class Mixin_InGameOverlayRenderer_FirstPersonFireOverlay {
             //$$ matrices.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion((r == 1 ? -10.0f : 10.0f)));
             //#endif
 
-            Matrix4f matrix4f = matrices.peek().getPositionMatrix();
+            OmniMatrixStack omniMatrixStack = OmniMatrixStacks.vanilla(matrices);
+            OmniBufferBuilder bufferBuilder = OmniBufferBuilders.create(DrawMode.QUADS, DefaultVertexFormats.POSITION_TEXTURE_COLOR);
 
-            //#if MC < 1.21
-            //$$  bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR_TEXTURE);
-            //$$  bufferBuilder.vertex(matrix4f, -0.5f, -0.5f, -0.5f).color(1.0f, 1.0f, 1.0f, fireOpacity).texture(interpolatedU2, interpolatedV2).next();
-            //$$  bufferBuilder.vertex(matrix4f, 0.5f, -0.5f, -0.5f).color(1.0f, 1.0f, 1.0f, fireOpacity).texture(interpolatedU1, interpolatedV2).next();
-            //$$  bufferBuilder.vertex(matrix4f, 0.5f, 0.5f, -0.5f).color(1.0f, 1.0f, 1.0f, fireOpacity).texture(interpolatedU1, interpolatedV1).next();
-            //$$  bufferBuilder.vertex(matrix4f, -0.5f, 0.5f, -0.5f).color(1.0f, 1.0f, 1.0f, fireOpacity).texture(interpolatedU2, interpolatedV1).next();
-            //$$  BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
-            //#elseif MC >= 1.21 && MC <= 1.21.3
-            //$$  BufferBuilder bufferBuilder = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
-            //$$  bufferBuilder.vertex(matrix4f, -0.5f, -0.5f, -0.5f).texture(interpolatedU2, interpolatedV2).color(1.0f, 1.0f, 1.0f, fireOpacity);
-            //$$  bufferBuilder.vertex(matrix4f, 0.5f, -0.5f, -0.5f).texture(interpolatedU1, interpolatedV2).color(1.0f, 1.0f, 1.0f, fireOpacity);
-            //$$  bufferBuilder.vertex(matrix4f, 0.5f, 0.5f, -0.5f).texture(interpolatedU1, interpolatedV1).color(1.0f, 1.0f, 1.0f, fireOpacity);
-            //$$  bufferBuilder.vertex(matrix4f, -0.5f, 0.5f, -0.5f).texture(interpolatedU2, interpolatedV1).color(1.0f, 1.0f, 1.0f, fireOpacity);
-            //$$  BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
-            //#else
-            vertexConsumer.vertex(matrix4f, -0.5f, -0.5f, -0.5f).texture(interpolatedU2, interpolatedV2).color(1.0f, 1.0f, 1.0f, fireOpacity);
-            vertexConsumer.vertex(matrix4f, 0.5f, -0.5f, -0.5f).texture(interpolatedU1, interpolatedV2).color(1.0f, 1.0f, 1.0f, fireOpacity);
-            vertexConsumer.vertex(matrix4f, 0.5f, 0.5f, -0.5f).texture(interpolatedU1, interpolatedV1).color(1.0f, 1.0f, 1.0f, fireOpacity);
-            vertexConsumer.vertex(matrix4f, -0.5f, 0.5f, -0.5f).texture(interpolatedU2, interpolatedV1).color(1.0f, 1.0f, 1.0f, fireOpacity);
-            //#endif
+            bufferBuilder.vertex(omniMatrixStack, -0.5f, -0.5f, -0.5f).texture(interpolatedU2, interpolatedV2).color(1.0f, 1.0f, 1.0f, fireOpacity).next();
+            bufferBuilder.vertex(omniMatrixStack, 0.5f, -0.5f, -0.5f).texture(interpolatedU1, interpolatedV2).color(1.0f, 1.0f, 1.0f, fireOpacity).next();
+            bufferBuilder.vertex(omniMatrixStack, 0.5f, 0.5f, -0.5f).texture(interpolatedU1, interpolatedV1).color(1.0f, 1.0f, 1.0f, fireOpacity).next();
+            bufferBuilder.vertex(omniMatrixStack, -0.5f, 0.5f, -0.5f).texture(interpolatedU2, interpolatedV1).color(1.0f, 1.0f, 1.0f, fireOpacity).next();
+            bufferBuilder.buildOrNull().draw(getPipeline(), f -> {});
 
             matrices.pop();
         }
-        //#if MC <= 1.21.3
-        //$$  RenderSystem.disableBlend();
-        //$$  RenderSystem.depthMask(true);
-        //$$  RenderSystem.depthFunc(515);
-        //#endif
-        //#endif
+    }
+
+    @Unique
+    private static OmniRenderPipeline getPipeline() {
+        if (pipeline == null) {
+            OmniRenderPipelineBuilder builder = OmniRenderPipelines.builderWithDefaultShader(
+                    OmniIdentifier.createOrNull("block/soul_fire_1"),
+                    DefaultVertexFormats.POSITION_TEXTURE_COLOR,
+                    DrawMode.QUADS
+            );
+            builder.blendState = OmniBlendState.NORMAL;
+
+            pipeline = builder.build();
+        }
+        return pipeline;
     }
 
 }

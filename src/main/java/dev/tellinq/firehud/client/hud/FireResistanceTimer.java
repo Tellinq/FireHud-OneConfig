@@ -1,7 +1,6 @@
 package dev.tellinq.firehud.client.hud;
 
-import dev.deftu.omnicore.client.OmniClient;
-import dev.deftu.omnicore.client.OmniClientPlayer;
+import dev.deftu.omnicore.api.client.OmniClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -29,7 +28,7 @@ public class FireResistanceTimer extends TextHud {
     protected @Nullable String getText() {
         //#if MC > 1.20.6
         ClientWorld world = OmniClient.getWorld();
-        ClientPlayerEntity player = OmniClientPlayer.getInstance();
+        ClientPlayerEntity player = OmniClient.getPlayer();
 
         if (player != null && world != null) {
             StatusEffectInstance fireRes = player.getStatusEffect(StatusEffects.FIRE_RESISTANCE);
